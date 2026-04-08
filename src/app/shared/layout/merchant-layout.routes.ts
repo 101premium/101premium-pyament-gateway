@@ -1,0 +1,39 @@
+import { Routes } from '@angular/router';
+import { AuditDetailPageComponent } from '../../features/audit/pages/audit-detail/audit-detail-page.component';
+import { AuditHomePageComponent } from '../../features/audit/pages/audit-home/audit-home-page.component';
+import { DashboardHomePageComponent } from '../../features/dashboard/pages/dashboard-home/dashboard-home-page.component';
+import { PaymentDetailPageComponent } from '../../features/payment/pages/payment-detail/payment-detail-page.component';
+import { PaymentHomePageComponent } from '../../features/payment/pages/payment-home/payment-home-page.component';
+import { AddCustomerPageComponent } from '../../features/tools/pages/add-customer/add-customer-page.component';
+import { CreateInvoicePageComponent } from '../../features/tools/pages/create-invoice/create-invoice-page.component';
+import { NewPaymentLinkPageComponent } from '../../features/tools/pages/new-payment-link/new-payment-link-page.component';
+import { AddRolePageComponent } from '../../features/users/pages/add-role/add-role-page.component';
+import { AddUserPageComponent } from '../../features/users/pages/add-user/add-user-page.component';
+import { UserDetailPageComponent } from '../../features/users/pages/user-detail/user-detail-page.component';
+import { UserHomePageComponent } from '../../features/users/pages/user-home/user-home-page.component';
+import { SettingsHomePageComponent } from '../../features/settings/pages/settings-home/settings-home-page.component';
+import { ChangePasswordPageComponent } from '../../features/settings/pages/change-password/change-password-page.component';
+import { MerchantHomePageComponent } from '../../features/merchant/pages/merchant-home/merchant-home-page.component';
+import { MerchantDetailPageComponent } from '../../features/merchant/pages/merchant-detail/merchant-detail-page.component';
+import { AddMerchantPageComponent } from '../../features/merchant/pages/add-merchant/add-merchant-page.component';
+
+/** Child routes rendered inside `MerchantLayoutComponent` (`<router-outlet />`). */
+export const merchantLayoutRoutes: Routes = [
+  { path: 'dashboard', component: DashboardHomePageComponent },
+  { path: 'payment', component: PaymentHomePageComponent },
+  { path: 'payment/:transactionId', component: PaymentDetailPageComponent },
+  { path: 'audit', component: AuditHomePageComponent },
+  { path: 'audit/:auditId', component: AuditDetailPageComponent },
+  { path: 'merchants/new', component: AddMerchantPageComponent },
+  { path: 'merchants/:uniqueId', component: MerchantDetailPageComponent },
+  { path: 'merchants', component: MerchantHomePageComponent },
+  { path: 'teams', component: UserHomePageComponent },
+  { path: 'teams/users/new', component: AddUserPageComponent },
+  { path: 'teams/users/:uniqueId', component: UserDetailPageComponent },
+  { path: 'teams/roles/new', component: AddRolePageComponent },
+  { path: 'settings/change-password', component: ChangePasswordPageComponent },
+  { path: 'settings', component: SettingsHomePageComponent },
+  { path: 'invoice/create', component: CreateInvoicePageComponent },
+  { path: 'customers/new', component: AddCustomerPageComponent },
+  { path: 'payment-links/new', component: NewPaymentLinkPageComponent }
+];

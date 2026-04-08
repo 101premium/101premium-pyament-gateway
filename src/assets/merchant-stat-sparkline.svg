@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 16" fill="none" aria-hidden="true">
+  <!-- White shapes: used as CSS mask (opaque = show `background-color` on ::after). -->
+  <g fill="#fff">
+    <rect x="0" y="14" width="3" height="2" />
+    <rect x="4" y="14" width="3" height="2" />
+    <rect x="8" y="13" width="3" height="3" />
+    <rect x="12" y="11" width="3" height="5" />
+    <rect x="16" y="9" width="3" height="7" />
+    <rect x="20" y="7" width="3" height="9" />
+    <rect x="24" y="1" width="3" height="15" />
+    <rect x="28" y="4" width="3" height="12" />
+    <rect x="32" y="9" width="3" height="7" />
+    <rect x="36" y="6" width="3" height="10" />
+    <rect x="40" y="3" width="3" height="13" />
+    <rect x="44" y="7" width="3" height="9" />
+    <rect x="48" y="10" width="3" height="6" />
+    <rect x="52" y="8" width="3" height="8" />
+    <rect x="56" y="10" width="3" height="6" />
+    <rect x="60" y="12" width="3" height="4" />
+    <rect x="64" y="13" width="3" height="3" />
+    <rect x="68" y="14" width="3" height="2" />
+    <rect x="72" y="14" width="3" height="2" />
+  </g>
+</svg>
