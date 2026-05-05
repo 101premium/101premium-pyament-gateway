@@ -25,7 +25,10 @@ import {
   PaymentTransactionPageResult,
   TransactionPageRecord,
   TransactionDetailResponse,
-  TransactionPageResponse
+  TransactionPageResponse,
+  WalletStatusRequest,
+  WalletStatusResult,
+  WalletStatusResponse
 } from './payments.models';
 
 @Injectable({ providedIn: 'root' })
@@ -37,6 +40,7 @@ export class PaymentsService {
   private readonly paymentAssetNetworksUrl = `${environment.apiBaseUrl}/payment/assets/network`;
   private readonly walletPayoutUrl = `${environment.apiBaseUrl}/payment/wallet/payout`;
   private readonly paymentWalletUrl = `${environment.apiBaseUrl}/payment/wallet`;
+  private readonly walletStatusUrl = `${environment.apiBaseUrl}/payment/wallet/status`;
 
   /**
    * GET …/transaction/page — response shape:
@@ -86,6 +90,12 @@ export class PaymentsService {
 
   createPaymentWallet(payload: PaymentWalletRequest): Observable<PaymentWalletResponse> {
     return this.http.post<PaymentWalletResponse>(this.paymentWalletUrl, payload);
+  }
+
+  checkWalletStatus(reference: string, payload: WalletStatusRequest): Observable<WalletStatusResult> {
+    return this.http
+      .post<WalletStatusResponse>(`${this.walletStatusUrl}/${encodeURIComponent(reference)}`, payload)
+      .pipe(map((res) => res.data ?? { code: '', description: 'No status returned.' }));
   }
 
   mapTransactionDetailForView(response: TransactionDetailResponse): PaymentTransactionDetailView {

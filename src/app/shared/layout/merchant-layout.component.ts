@@ -323,6 +323,12 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
             <circle cx="10.5" cy="12" r="1.5" />
           </svg>
         }
+        @case ('wallet') {
+          <svg class="nav-icon__svg size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2" />
+            <path d="M16 12a2 2 0 0 1 2-2h3v4h-3a2 2 0 0 1-2-2Z" />
+          </svg>
+        }
         @case ('question-mark-circle') {
           <svg class="nav-icon__svg size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 18h.008v.008H12V18Z" />
@@ -410,6 +416,7 @@ export class MerchantLayoutComponent {
       { label: 'Payment Link', icon: 'link', link: '/payment-link' },
       { label: 'Payout', icon: 'banknotes', link: '/payout' },
       { label: 'Balance', icon: 'banknotes', link: '/balance' },
+      { label: 'Wallet', icon: 'wallet', link: '/wallet' },
       { label: 'Teams', icon: 'users', link: '/teams' },
       { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit' },
       { label: 'Merchants', icon: 'building-storefront', link: '/merchants' },

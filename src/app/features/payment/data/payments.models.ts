@@ -154,3 +154,18 @@ export interface PaymentWalletResponse {
   description?: string;
   data?: PaymentWallet | null;
 }
+
+export interface WalletStatusRequest {
+  merchantId: string;
+}
+
+export interface WalletStatusResult {
+  code: string;
+  description: string;
+}
+
+export interface WalletStatusResponse {
+  code?: string;
+  description?: string;
+  data?: WalletStatusResult | null;
+}

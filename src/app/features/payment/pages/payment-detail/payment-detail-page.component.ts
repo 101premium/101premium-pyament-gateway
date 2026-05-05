@@ -4,6 +4,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PaymentsService } from '../../data/payments.service';
+import { WalletStatusResult } from '../../data/payments.models';
 
 @Component({
   selector: 'app-payment-detail-page',
@@ -67,6 +68,32 @@ import { PaymentsService } from '../../data/payments.service';
               <span class="mt-1 block text-sm text-[#607089]">{{ transaction()!.createdDate }}</span>
             </div>
           </div>
+
+          <div class="mt-4 grid gap-3">
+            <button
+              type="button"
+              class="w-full rounded-full bg-[var(--primary)] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+              [disabled]="statusChecking()"
+              (click)="checkStatus()"
+            >
+              {{ statusChecking() ? 'Checking...' : 'Check Status' }}
+            </button>
+
+            <div
+              *ngIf="statusResult()"
+              class="rounded-[1rem] border p-3 text-sm"
+              [class]="statusResult()!.code === '00' || statusResult()!.code === '200' || statusResult()!.code === '0'
+                ? 'border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]'
+                : 'border-[#fde8e0] bg-[#fff6f5] text-[#b42318]'"
+            >
+              <span class="block font-semibold">Status {{ statusResult()!.code }}</span>
+              <span class="mt-0.5 block">{{ statusResult()!.description }}</span>
+            </div>
+
+            <p *ngIf="statusError()" class="m-0 rounded-[1rem] border border-[#fde8e0] bg-[#fff6f5] p-3 text-sm text-[#b42318]">
+              {{ statusError() }}
+            </p>
+          </div>
         </aside>
       </section>
     </main>
@@ -79,6 +106,9 @@ export class PaymentDetailPageComponent {
   protected readonly transaction = signal<ReturnType<PaymentsService['mapTransactionDetailForView']> | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal('');
+  protected readonly statusChecking = signal(false);
+  protected readonly statusResult = signal<WalletStatusResult | null>(null);
+  protected readonly statusError = signal('');
 
   constructor() {
     const transactionId = this.route.snapshot.paramMap.get('transactionId') ?? '';
@@ -113,6 +143,37 @@ export class PaymentDetailPageComponent {
       { label: 'Checkout URL', value: transaction.checkoutUrl },
       { label: 'Error', value: transaction.errorText }
     ];
+  }
+
+  protected checkStatus(): void {
+    const transaction = this.transaction();
+    if (!transaction) {
+      return;
+    }
+
+    this.statusChecking.set(true);
+    this.statusResult.set(null);
+    this.statusError.set('');
+
+    this.paymentsService
+      .checkWalletStatus(transaction.transactionId, { merchantId: transaction.merchantId })
+      .pipe(finalize(() => this.statusChecking.set(false)))
+      .subscribe({
+        next: (result) => this.statusResult.set(result),
+        error: (error: unknown) => this.statusError.set(this.resolveStatusError(error))
+      });
+  }
+
+  private resolveStatusError(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      if (typeof error.error?.description === 'string' && error.error.description.trim()) {
+        return error.error.description;
+      }
+      if (error.status === 401) {
+        return 'Session expired. Please sign in again.';
+      }
+    }
+    return 'Unable to check transaction status right now.';
   }
 
   private resolveErrorMessage(error: unknown): string {
