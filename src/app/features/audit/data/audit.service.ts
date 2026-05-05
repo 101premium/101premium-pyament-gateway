@@ -163,6 +163,7 @@ function mapAuditDetail(row: Record<string, unknown>): AuditDetailView {
 
   return {
     id: stringValue(row['id']) || '—',
+    uniqueId: stringValue(row['uniqueId']) || '—',
     email: stringValue(row['email']) || 'No email provided',
     event: stringValue(row['event']) || 'Audit event',
     flag:
@@ -188,17 +189,34 @@ function extractAuditDetailRecord(response: unknown): Record<string, unknown> | 
     return null;
   }
 
-  if (numberValue(root['id']) !== null || stringValue(root['event']) || stringValue(root['request'])) {
+  if (
+    numberValue(root['id']) !== null ||
+    stringValue(root['uniqueId']) ||
+    stringValue(root['event']) ||
+    stringValue(root['request'])
+  ) {
     return root;
   }
 
   const data = asRecord(root['data']);
-  if (data && (numberValue(data['id']) !== null || stringValue(data['event']) || stringValue(data['request']))) {
+  if (
+    data &&
+    (numberValue(data['id']) !== null ||
+      stringValue(data['uniqueId']) ||
+      stringValue(data['event']) ||
+      stringValue(data['request']))
+  ) {
     return data;
   }
 
   const nested = asRecord(data?.['data']);
-  if (nested && (numberValue(nested['id']) !== null || stringValue(nested['event']) || stringValue(nested['request']))) {
+  if (
+    nested &&
+    (numberValue(nested['id']) !== null ||
+      stringValue(nested['uniqueId']) ||
+      stringValue(nested['event']) ||
+      stringValue(nested['request']))
+  ) {
     return nested;
   }
 
@@ -230,6 +248,6 @@ function auditStatusTone(status: string): string {
 }
 
 function resolveAuditRoute(row: Record<string, unknown>): string | undefined {
-  const id = stringValue(row['id']);
+  const id = stringValue(row['uniqueId']) || stringValue(row['id']);
   return id ? `/audit/${encodeURIComponent(id)}` : undefined;
 }

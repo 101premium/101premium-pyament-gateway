@@ -16,6 +16,7 @@ export interface AuditPageResult {
 
 export interface AuditListItem {
   id: number;
+  uniqueId: string | null;
   email: string | null;
   event: string | null;
   flag: string | null;
@@ -47,6 +48,7 @@ export interface AuditDetailResponse {
 
 export interface AuditDetailView {
   id: string;
+  uniqueId: string;
   email: string;
   event: string;
   flag: string;

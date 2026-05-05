@@ -2,6 +2,10 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
+    path: 'auth/account/change-password/:resetToken',
+    renderMode: RenderMode.Server
+  },
+  {
     path: 'payment/:transactionId',
     renderMode: RenderMode.Server
   },

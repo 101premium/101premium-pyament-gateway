@@ -64,7 +64,36 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
           <p class="m-0 text-[0.78rem] font-bold uppercase tracking-[0.24em] text-[#91a0bb]">Menu</p>
           <nav class="grid gap-[0.45rem]">
             @for (item of menuItems; track item.label) {
-              @if (item.link) {
+              @if (item.children?.length) {
+                <div class="grid gap-1">
+                  <a
+                    class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#2e39d3]"
+                    [routerLink]="item.link"
+                    routerLinkActive="bg-[#eef0ff] text-[#2e39d3]"
+                    [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                    (click)="closeSidebarOnMobile()"
+                  >
+                    <span class="grid h-5 w-5 shrink-0 place-items-center text-inherit" aria-hidden="true">
+                      <ng-container [ngTemplateOutlet]="navIcon" [ngTemplateOutletContext]="{ icon: item.icon }" />
+                    </span>
+                    <span class="text-[1.05rem] font-medium leading-none">{{ item.label }}</span>
+                  </a>
+
+                  <div class="ml-8 grid gap-1 border-l border-[rgba(138,158,191,0.16)] pl-3">
+                    @for (child of item.children; track child.label) {
+                      <a
+                        class="flex min-h-10 w-full items-center rounded-xl px-3 py-2 text-left text-[0.95rem] font-semibold text-[#7b8ba6] no-underline transition duration-200 ease-out hover:bg-[#f3f4ff] hover:text-[#2e39d3]"
+                        [routerLink]="child.link"
+                        routerLinkActive="bg-[#eef0ff] text-[#2e39d3]"
+                        [routerLinkActiveOptions]="{ exact: child.exact ?? false }"
+                        (click)="closeSidebarOnMobile()"
+                      >
+                        {{ child.label }}
+                      </a>
+                    }
+                  </div>
+                </div>
+              } @else if (item.link) {
                 <a
                   class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#2e39d3]"
                   [routerLink]="item.link"
@@ -258,6 +287,13 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
             <circle cx="12" cy="12" r="2.25" />
           </svg>
         }
+        @case ('link') {
+          <svg class="nav-icon__svg size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.5 13.5 13.5 10.5" />
+            <path d="M8.25 15.75 6.9 17.1a3.75 3.75 0 0 1-5.3-5.3l2.65-2.65a3.75 3.75 0 0 1 5.3 0" />
+            <path d="m15.75 8.25 1.35-1.35a3.75 3.75 0 0 1 5.3 5.3l-2.65 2.65a3.75 3.75 0 0 1-5.3 0" />
+          </svg>
+        }
         @case ('clipboard-document-list') {
           <svg class="nav-icon__svg size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 2.25h6a1.5 1.5 0 0 1 1.5 1.5V4.5h1.125A2.625 2.625 0 0 1 20.25 7.125v12.75A2.625 2.625 0 0 1 17.625 22.5H6.375A2.625 2.625 0 0 1 3.75 19.875V7.125A2.625 2.625 0 0 1 6.375 4.5H7.5v-.75A1.5 1.5 0 0 1 9 2.25Z" />
@@ -358,9 +394,22 @@ export class MerchantLayoutComponent {
     icon: string;
     link?: string;
     exact?: boolean;
+    children?: {
+      label: string;
+      link: string;
+      exact?: boolean;
+    }[];
   }[] = [
       { label: 'Overview', icon: 'home', link: '/dashboard', exact: true },
-      { label: 'Payments', icon: 'credit-card', link: '/payment' },
+      {
+        label: 'Payments',
+        icon: 'credit-card',
+        link: '/transactions',
+        children: [{ label: 'Transactions', link: '/transactions', exact: true }]
+      },
+      { label: 'Payment Link', icon: 'link', link: '/payment-link' },
+      { label: 'Payout', icon: 'banknotes', link: '/payout' },
+      { label: 'Balance', icon: 'banknotes', link: '/balance' },
       { label: 'Teams', icon: 'users', link: '/teams' },
       { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit' },
       { label: 'Merchants', icon: 'building-storefront', link: '/merchants' },

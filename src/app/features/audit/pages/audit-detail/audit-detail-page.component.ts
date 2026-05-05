@@ -64,6 +64,10 @@ import { AuditService } from '../../data/audit.service';
           <p class="m-0 text-xs font-semibold uppercase tracking-[0.16em] text-[#8fa0b8]">Summary</p>
           <div class="mt-4 grid gap-4 rounded-[1.4rem] bg-[#f8fbff] p-4">
             <div>
+              <span class="block text-xs font-semibold uppercase tracking-[0.14em] text-[#91a0bb]">Unique ID</span>
+              <strong class="mt-1 block break-words text-sm text-[#2f3743]">{{ audit()!.uniqueId }}</strong>
+            </div>
+            <div>
               <span class="block text-xs font-semibold uppercase tracking-[0.14em] text-[#91a0bb]">Record ID</span>
               <strong class="mt-1 block text-sm text-[#2f3743]">{{ audit()!.id }}</strong>
             </div>
@@ -126,6 +130,7 @@ export class AuditDetailPageComponent {
 
     return [
       { label: 'Email', value: audit.email },
+      { label: 'Unique ID', value: audit.uniqueId },
       { label: 'Flag', value: audit.flag },
       { label: 'Request', value: audit.request },
       { label: 'IP address', value: audit.ipAddress },

@@ -12,6 +12,14 @@ import {
 } from '../../../shared/utils/format.utils';
 import {
   PaymentQueryParams,
+  PaymentAsset,
+  PaymentAssetNetwork,
+  PaymentAssetNetworksResponse,
+  PaymentAssetsResponse,
+  PayoutRequest,
+  PayoutResponse,
+  PaymentWalletRequest,
+  PaymentWalletResponse,
   PaymentTransaction,
   PaymentTransactionDetailView,
   PaymentTransactionPageResult,
@@ -25,6 +33,10 @@ export class PaymentsService {
   private readonly http = inject(HttpClient);
   private readonly transactionPageUrl = `${environment.apiBaseUrl}/transaction/page`;
   private readonly transactionDetailUrl = `${environment.apiBaseUrl}/transaction`;
+  private readonly paymentAssetsUrl = `${environment.apiBaseUrl}/payment/assets`;
+  private readonly paymentAssetNetworksUrl = `${environment.apiBaseUrl}/payment/assets/network`;
+  private readonly walletPayoutUrl = `${environment.apiBaseUrl}/payment/wallet/payout`;
+  private readonly paymentWalletUrl = `${environment.apiBaseUrl}/payment/wallet`;
 
   /**
    * GET …/transaction/page — response shape:
@@ -52,6 +64,28 @@ export class PaymentsService {
     return this.http
       .get<TransactionDetailResponse>(`${this.transactionDetailUrl}/${encodeURIComponent(transactionId)}`)
       .pipe(map((response) => this.mapTransactionDetailForView(response)));
+  }
+
+  getPaymentAssets(): Observable<PaymentAsset[]> {
+    return this.http
+      .get<PaymentAssetsResponse>(this.paymentAssetsUrl)
+      .pipe(map((response) => response.data ?? []));
+  }
+
+  getPaymentAssetNetworks(coin: string): Observable<PaymentAssetNetwork[]> {
+    const params = new HttpParams().set('coin', coin);
+
+    return this.http
+      .get<PaymentAssetNetworksResponse>(this.paymentAssetNetworksUrl, { params })
+      .pipe(map((response) => response.data ?? []));
+  }
+
+  initiateWalletPayout(payload: PayoutRequest): Observable<PayoutResponse> {
+    return this.http.post<PayoutResponse>(this.walletPayoutUrl, payload);
+  }
+
+  createPaymentWallet(payload: PaymentWalletRequest): Observable<PaymentWalletResponse> {
+    return this.http.post<PaymentWalletResponse>(this.paymentWalletUrl, payload);
   }
 
   mapTransactionDetailForView(response: TransactionDetailResponse): PaymentTransactionDetailView {

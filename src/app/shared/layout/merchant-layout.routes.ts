@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
 import { AuditDetailPageComponent } from '../../features/audit/pages/audit-detail/audit-detail-page.component';
 import { AuditHomePageComponent } from '../../features/audit/pages/audit-home/audit-home-page.component';
+import { BalanceHomePageComponent } from '../../features/balance/pages/balance-home/balance-home-page.component';
 import { DashboardHomePageComponent } from '../../features/dashboard/pages/dashboard-home/dashboard-home-page.component';
 import { PaymentDetailPageComponent } from '../../features/payment/pages/payment-detail/payment-detail-page.component';
 import { PaymentHomePageComponent } from '../../features/payment/pages/payment-home/payment-home-page.component';
+import { PaymentLinkHomePageComponent } from '../../features/payment-link/pages/payment-link-home/payment-link-home-page.component';
 import { AddCustomerPageComponent } from '../../features/tools/pages/add-customer/add-customer-page.component';
 import { CreateInvoicePageComponent } from '../../features/tools/pages/create-invoice/create-invoice-page.component';
 import { NewPaymentLinkPageComponent } from '../../features/tools/pages/new-payment-link/new-payment-link-page.component';
@@ -20,6 +22,10 @@ import { AddMerchantPageComponent } from '../../features/merchant/pages/add-merc
 /** Child routes rendered inside `MerchantLayoutComponent` (`<router-outlet />`). */
 export const merchantLayoutRoutes: Routes = [
   { path: 'dashboard', component: DashboardHomePageComponent },
+  { path: 'balance', component: BalanceHomePageComponent },
+  { path: 'transactions', component: PaymentHomePageComponent },
+  { path: 'payment-link', component: PaymentLinkHomePageComponent },
+  { path: 'payout', component: PaymentHomePageComponent },
   { path: 'payment', component: PaymentHomePageComponent },
   { path: 'payment/:transactionId', component: PaymentDetailPageComponent },
   { path: 'audit', component: AuditHomePageComponent },

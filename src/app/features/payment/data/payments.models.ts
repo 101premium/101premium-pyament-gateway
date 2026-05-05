@@ -92,3 +92,65 @@ export interface PaymentTransactionPageResult {
   totalPages: number;
   totalItems: number;
 }
+
+export interface PaymentAsset {
+  name: string;
+  coin: string;
+}
+
+export interface PaymentAssetsResponse {
+  code: string;
+  description: string;
+  data: PaymentAsset[];
+}
+
+export interface PaymentAssetNetwork {
+  network: string;
+  coin: string;
+}
+
+export interface PaymentAssetNetworksResponse {
+  code: string;
+  description: string;
+  data: PaymentAssetNetwork[];
+}
+
+export interface PayoutRequest {
+  reference: string;
+  amount: number;
+  coin: string;
+  network: string;
+  description: string;
+  walletAddress: string;
+}
+
+export interface PayoutResponse {
+  code?: string;
+  description?: string;
+  data?: unknown;
+}
+
+export interface PaymentWalletRequest {
+  ref: string;
+  coin: string;
+  customEmail: string;
+  network: string;
+}
+
+export interface PaymentWallet {
+  ref: string;
+  paymentReference: string;
+  address: string;
+  currency: string;
+  network: string;
+  message: string;
+  notice: string;
+  mode: string;
+  transactionType: string;
+}
+
+export interface PaymentWalletResponse {
+  code?: string;
+  description?: string;
+  data?: PaymentWallet | null;
+}

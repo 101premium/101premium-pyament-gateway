@@ -8,22 +8,32 @@ import {
   SummaryTableComponent,
   SummaryTableHeaders
 } from '../../../../shared/components/payment-transactions-table/payment-transactions-table.component';
+import { StableCoinWalletModalComponent } from '../../../../shared/components/stable-coin-wallet-modal/stable-coin-wallet-modal.component';
 import { MerchantSearchService } from '../../../../shared/services/merchant-search.service';
 import { PaymentTransaction } from '../../../payment/data/payments.models';
 import { PaymentsService } from '../../../payment/data/payments.service';
+import { DashboardService } from '../../data/dashboard.service';
+import { DashboardStatsData } from '../../data/dashboard.models';
 
 @Component({
   selector: 'app-dashboard-home-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, SummaryTableComponent],
+  imports: [CommonModule, RouterLink, StableCoinWalletModalComponent, SummaryTableComponent],
   template: `
     <main class="dashboard-main merchant-main">
         <section class="merchant-stats">
-          <article class="merchant-stat-card" *ngFor="let stat of stats">
-            <p class="stat-label">{{ stat.label }}</p>
-            <strong>{{ stat.value }}</strong>
-            <span>{{ stat.note }}</span>
-          </article>
+          @if (statsLoading()) {
+            <article class="merchant-stat-card" *ngFor="let _ of [1,2,3,4]">
+              <p class="stat-label skeleton-text"></p>
+              <strong class="skeleton-text"></strong>
+            </article>
+          } @else {
+            <article class="merchant-stat-card" *ngFor="let stat of stats()">
+              <p class="stat-label">{{ stat.label }}</p>
+              <strong>{{ stat.value }}</strong>
+              <span>{{ stat.note }}</span>
+            </article>
+          }
         </section>
 
         <section class="merchant-content">
@@ -49,47 +59,55 @@ import { PaymentsService } from '../../../payment/data/payments.service';
                 ></span>
               </div>
             </article>
-
-            <section class="transactions-section">
-              <div class="section-header">
-                <h3>Payment Transactions</h3>
-                <a routerLink="/payment">View all →</a>
-              </div>
-
-              <app-summary-table
-                [rows]="transactions()"
-                [headers]="tableHeaders"
-                [isLoading]="isLoading()"
-                [errorMessage]="errorMessage()"
-                [loadingMessage]="'Loading payment transactions...'"
-                [emptyTitle]="'No payment transactions found.'"
-              />
-            </section>
           </div>
 
           <aside class="merchant-secondary">
             <section class="quick-actions">
               <h3>Quick Actions</h3>
 
-              <a class="action-card" *ngFor="let action of quickActions" [routerLink]="action.route">
-                <div class="action-icon" [class]="action.iconClass">{{ action.icon }}</div>
-                <div class="action-copy">
-                  <strong>{{ action.title }}</strong>
-                  <span>{{ action.description }}</span>
-                </div>
-                <span class="action-arrow" aria-hidden="true">›</span>
-              </a>
+              @for (action of quickActions; track action.title) {
+                @if (action.kind === 'wallet') {
+                  <a
+                    class="action-card cursor-pointer"
+                    href="#"
+                    (click)="$event.preventDefault(); openWalletModal()"
+                  >
+                    <div class="action-icon" [class]="action.iconClass">{{ action.icon }}</div>
+                    <div class="action-copy">
+                      <strong>{{ action.title }}</strong>
+                      <span>{{ action.description }}</span>
+                    </div>
+                    <span class="action-arrow" aria-hidden="true">›</span>
+                  </a>
+                } @else {
+                  <a class="action-card" [routerLink]="action.route">
+                    <div class="action-icon" [class]="action.iconClass">{{ action.icon }}</div>
+                    <div class="action-copy">
+                      <strong>{{ action.title }}</strong>
+                      <span>{{ action.description }}</span>
+                    </div>
+                    <span class="action-arrow" aria-hidden="true">›</span>
+                  </a>
+                }
+              }
             </section>
-            <article class="payout-card">
-              <div class="payout-visual" aria-hidden="true"></div>
-              <div class="payout-copy">
-                <p class="eyebrow">Next Automated Payout</p>
-                <strong>April 16, 2026</strong>
-                <span>Estimated Amount</span>
-                <b>$8,420.50</b>
-              </div>
-            </article>
           </aside>
+        </section>
+
+        <section class="transactions-section">
+          <div class="section-header">
+            <h3>Payment Transactions</h3>
+            <a routerLink="/payment">View all →</a>
+          </div>
+
+          <app-summary-table
+            [rows]="transactions()"
+            [headers]="tableHeaders"
+            [isLoading]="isLoading()"
+            [errorMessage]="errorMessage()"
+            [loadingMessage]="'Loading payment transactions...'"
+            [emptyTitle]="'No payment transactions found.'"
+          />
         </section>
 
         <footer class="merchant-footer">
@@ -101,6 +119,12 @@ import { PaymentsService } from '../../../payment/data/payments.service';
           </div>
         </footer>
     </main>
+
+    <app-stable-coin-wallet-modal
+      *ngIf="walletModalOpen()"
+      (dismiss)="closeWalletModal()"
+      (generated)="handleWalletGenerated()"
+    />
   `,
   styles: `
     :host {
@@ -111,12 +135,16 @@ import { PaymentsService } from '../../../payment/data/payments.service';
 export class DashboardHomePageComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly paymentsService = inject(PaymentsService);
+  private readonly dashboardService = inject(DashboardService);
   private readonly merchantSearch = inject(MerchantSearchService);
   protected readonly pageSize = 10;
 
   protected readonly transactions = signal<PaymentTransaction[]>([]);
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly walletModalOpen = signal(false);
+  protected readonly statsLoading = signal(false);
+  protected readonly stats = signal<{ label: string; value: string; note: string }[]>([]);
   protected readonly tableHeaders: SummaryTableHeaders = {
     primary: 'Customer',
     status: 'Status',
@@ -124,37 +152,23 @@ export class DashboardHomePageComponent {
     meta: 'Date'
   };
 
-  protected readonly stats = [
-    { label: 'Total Volume', value: '$142,590.20', note: '+8.2% vs last month' },
-    { label: 'Successful Payments', value: '2,842', note: '99.4% success rate' },
-    { label: 'Active Subscriptions', value: '1,120', note: '+42 new this week' },
-    { label: 'Pending Payouts', value: '$12,400.00', note: 'Next payout in 2 days' }
-  ];
-
   protected readonly chartBars = [36, 52, 42, 64, 56, 78, 88, 69, 61, 74, 64, 83, 56, 47];
   protected readonly activeBarIndex = 11;
 
   protected readonly quickActions = [
     {
-      title: 'Create Invoice',
-      description: 'Billing for professional services',
+      title: 'Create stable coin wallet',
+      description: 'Generate wallet for stable coin payments',
       icon: '⊞',
       iconClass: 'invoice',
-      route: '/invoice/create'
-    },
-    {
-      title: 'Add Customer',
-      description: 'Save details for recurring billing',
-      icon: '⊕',
-      iconClass: 'customer',
-      route: '/customers/new'
+      kind: 'wallet'
     },
     {
       title: 'New Payment Link',
       description: 'Shareable link for quick checkout',
       icon: '⌁',
       iconClass: 'payment-link',
-      route: '/payment-links/new'
+      route: '/payment-link'
     }
   ];
 
@@ -162,6 +176,44 @@ export class DashboardHomePageComponent {
     this.merchantSearch.debouncedQuery$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((searchParam) => this.loadTransactions(searchParam, 0));
+
+    this.loadDashboardStats();
+  }
+
+  private loadDashboardStats(): void {
+    this.statsLoading.set(true);
+
+    this.dashboardService
+      .getStats()
+      .pipe(
+        finalize(() => this.statsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (data) => this.stats.set(this.mapStatsToCards(data)),
+        error: () => this.stats.set([])
+      });
+  }
+
+  private mapStatsToCards(data: DashboardStatsData): { label: string; value: string; note: string }[] {
+    return [
+      { label: 'Total Transactions', value: String(data.totalCount), note: `Volume: ${data.totalTransaction}` },
+      { label: 'Successful', value: String(data.successfulCount), note: `Volume: ${data.successfulTransaction}` },
+      { label: 'Pending', value: String(data.pendingCount), note: `Volume: ${data.pendingTransaction}` },
+      { label: 'Failed', value: String(data.failedCount), note: `Volume: ${data.failedTransaction}` }
+    ];
+  }
+
+  protected openWalletModal(): void {
+    this.walletModalOpen.set(true);
+  }
+
+  protected closeWalletModal(): void {
+    this.walletModalOpen.set(false);
+  }
+
+  protected handleWalletGenerated(): void {
+    this.loadTransactions(this.merchantSearch.control.getRawValue(), 0);
   }
 
   private loadTransactions(searchParam: string, page: number): void {
