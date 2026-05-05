@@ -17,7 +17,7 @@ import { WalletService } from '../../data/wallet.service';
         <div>
           <p class="mb-1 text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-[#5b6c86]">Wallet</p>
           <h1 class="m-0 text-[clamp(1.45rem,2.2vw,1.85rem)] font-bold leading-[1.2] tracking-[-0.025em] text-[#2a3340]">
-            Wallet Transactions
+            Wallet
           </h1>
         </div>
       </div>

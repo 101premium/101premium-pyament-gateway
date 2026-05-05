@@ -174,8 +174,8 @@ function toPaymentTransaction(row: TransactionPageRecord): PaymentTransaction {
 
 function buildTransactionRoute(row: TransactionPageRecord): string | undefined {
   const key =
-    row.ref?.trim() ||
     row.transactionId?.trim() ||
+    row.ref?.trim() ||
     row.paymentReference?.trim() ||
     (row.id !== null && row.id !== undefined ? String(row.id) : '');
 
