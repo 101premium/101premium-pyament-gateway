@@ -5,10 +5,12 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../features/auth/data/auth.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const toast = inject(ToastService);
   const platformId = inject(PLATFORM_ID);
   const isPasswordActivationRequest = req.url.startsWith(
     `${environment.apiBaseUrl}/user/passwordactivation`
@@ -25,6 +27,7 @@ export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
         error.status === 401
       ) {
         authService.logout();
+        toast.show('Access denied. Please sign in again.', 'error');
 
         if (isPlatformBrowser(platformId) && window.location.pathname !== '/auth/login') {
           void router.navigateByUrl('/auth/login').catch(() => {

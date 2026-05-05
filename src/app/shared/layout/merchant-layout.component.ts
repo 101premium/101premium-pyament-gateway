@@ -410,16 +410,16 @@ export class MerchantLayoutComponent {
       {
         label: 'Payments',
         icon: 'credit-card',
-        link: '/transactions',
-        children: [{ label: 'Transactions', link: '/transactions', exact: true }]
+        link: '/payment',
+        children: [{ label: 'Transactions', link: '/payment', exact: true }]
       },
-      { label: 'Payment Link', icon: 'link', link: '/payment-link' },
       { label: 'Payout', icon: 'banknotes', link: '/payout' },
       { label: 'Balance', icon: 'banknotes', link: '/balance' },
       { label: 'Wallet', icon: 'wallet', link: '/wallet' },
+      { label: 'Merchants', icon: 'building-storefront', link: '/merchants' },
+      { label: 'Payment Link', icon: 'link', link: '/payment-link' },
       { label: 'Teams', icon: 'users', link: '/teams' },
       { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit' },
-      { label: 'Merchants', icon: 'building-storefront', link: '/merchants' },
       { label: 'Settings', icon: 'cog', link: '/settings' }
     ];
 

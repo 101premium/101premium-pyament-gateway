@@ -51,17 +51,25 @@ export class PaymentsService {
       .set('page', String(query.page))
       .set('size', String(query.size));
     const merchantId = query.merchantId?.trim();
+    const cryptoMode = query.cryptoMode?.trim();
     if (merchantId) {
       params = params.set('merchantId', merchantId);
     }
+
+     if (cryptoMode) {
+      params = params.set('cryptoMode', cryptoMode);
+    }
+    
     const search = query.searchParam?.trim();
     if (search) {
       params = params.set('searchParam', search);
     }
 
+    const routePrefix = query.routePrefix ?? '/payment';
+
     return this.http
       .get<TransactionPageResponse>(this.transactionPageUrl, { params })
-      .pipe(map(mapTransactionPageResponse));
+      .pipe(map((res) => mapTransactionPageResponse(res, routePrefix)));
   }
 
   getTransactionDetail(transactionId: string): Observable<PaymentTransactionDetailView> {
@@ -92,10 +100,10 @@ export class PaymentsService {
     return this.http.post<PaymentWalletResponse>(this.paymentWalletUrl, payload);
   }
 
-  checkWalletStatus(reference: string, payload: WalletStatusRequest): Observable<WalletStatusResult> {
+  checkWalletStatus(payload: WalletStatusRequest): Observable<WalletStatusResult | null> {
     return this.http
-      .post<WalletStatusResponse>(`${this.walletStatusUrl}/${encodeURIComponent(reference)}`, payload)
-      .pipe(map((res) => res.data ?? { code: '', description: 'No status returned.' }));
+      .post<WalletStatusResponse>(this.walletStatusUrl, payload)
+      .pipe(map((res) => res.data ?? null));
   }
 
   mapTransactionDetailForView(response: TransactionDetailResponse): PaymentTransactionDetailView {
@@ -112,6 +120,7 @@ export class PaymentsService {
       'Unknown customer';
 
     return {
+      ref: row.ref?.trim() || '',
       reference: row.ref?.trim() || 'Unavailable',
       message: row.transactionMessage?.trim() || 'No status message provided',
       status,
@@ -129,24 +138,26 @@ export class PaymentsService {
       cardPan: row.cardPan?.trim() || 'Unavailable',
       redirectUrl: row.redirectUrl?.trim() || 'Unavailable',
       checkoutUrl: row.checkoutUrl?.trim() || 'Unavailable',
-      errorText: row.errorMessage?.trim() || row.errorReason?.trim() || 'No error recorded'
+      errorText: row.errorMessage?.trim() || row.errorReason?.trim() || 'No error recorded',
+      cryptoMode: row.cryptoMode?.trim() || 'Unavailable',
+      address: row.address?.trim() || 'Unavailable'
     };
   }
 }
 
-function mapTransactionPageResponse(res: TransactionPageResponse): PaymentTransactionPageResult {
+function mapTransactionPageResponse(res: TransactionPageResponse, routePrefix: string): PaymentTransactionPageResult {
   const page = res.data;
   const rows = page?.data ?? [];
 
   return {
-    items: rows.map(toPaymentTransaction),
+    items: rows.map((row) => toPaymentTransaction(row, routePrefix)),
     currentPage: page?.currentPage ?? 0,
     totalPages: page?.totalPages ?? 0,
     totalItems: page?.totalItems ?? 0
   };
 }
 
-function toPaymentTransaction(row: TransactionPageRecord): PaymentTransaction {
+function toPaymentTransaction(row: TransactionPageRecord, routePrefix: string): PaymentTransaction {
   const name =
     [row.firstName, row.lastName]
       .map((s) => (typeof s === 'string' ? s.trim() : ''))
@@ -161,7 +172,7 @@ function toPaymentTransaction(row: TransactionPageRecord): PaymentTransaction {
   const currency = row.currency?.trim() || 'USD';
 
   return {
-    route: buildTransactionRoute(row),
+    route: buildTransactionRoute(row, routePrefix),
     initials: initialsFromName(name),
     name,
     email: row.email?.trim() || 'No email provided',
@@ -172,14 +183,14 @@ function toPaymentTransaction(row: TransactionPageRecord): PaymentTransaction {
   };
 }
 
-function buildTransactionRoute(row: TransactionPageRecord): string | undefined {
+function buildTransactionRoute(row: TransactionPageRecord, routePrefix: string): string | undefined {
   const key =
     row.transactionId?.trim() ||
     row.ref?.trim() ||
     row.paymentReference?.trim() ||
     (row.id !== null && row.id !== undefined ? String(row.id) : '');
 
-  return key ? `/payment/${encodeURIComponent(key)}` : undefined;
+  return key ? `${routePrefix}/${encodeURIComponent(key)}` : undefined;
 }
 
 function extractTransactionDetailRecord(response: TransactionDetailResponse): TransactionPageRecord {
@@ -207,7 +218,9 @@ function extractTransactionDetailRecord(response: TransactionDetailResponse): Tr
     errorReason: record?.errorReason ?? null,
     rail: record?.rail ?? null,
     checkoutUrl: record?.checkoutUrl ?? null,
-    createdDate: record?.createdDate ?? ''
+    createdDate: record?.createdDate ?? '',
+    cryptoMode: record?.cryptoMode ?? null,
+    address: record?.address ?? null
   };
 }
 

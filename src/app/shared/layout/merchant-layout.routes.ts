@@ -6,6 +6,8 @@ import { DashboardHomePageComponent } from '../../features/dashboard/pages/dashb
 import { PaymentDetailPageComponent } from '../../features/payment/pages/payment-detail/payment-detail-page.component';
 import { PaymentHomePageComponent } from '../../features/payment/pages/payment-home/payment-home-page.component';
 import { PaymentLinkHomePageComponent } from '../../features/payment-link/pages/payment-link-home/payment-link-home-page.component';
+import { PayoutHomePageComponent } from '../../features/payout/pages/payout-home/payout-home-page.component';
+import { PayoutDetailPageComponent } from '../../features/payout/pages/payout-detail/payout-detail-page.component';
 import { WalletHomePageComponent } from '../../features/wallet/pages/wallet-home/wallet-home-page.component';
 import { AddCustomerPageComponent } from '../../features/tools/pages/add-customer/add-customer-page.component';
 import { CreateInvoicePageComponent } from '../../features/tools/pages/create-invoice/create-invoice-page.component';
@@ -27,7 +29,8 @@ export const merchantLayoutRoutes: Routes = [
   { path: 'wallet', component: WalletHomePageComponent },
   { path: 'transactions', component: PaymentHomePageComponent },
   { path: 'payment-link', component: PaymentLinkHomePageComponent },
-  { path: 'payout', component: PaymentHomePageComponent },
+  { path: 'payout', component: PayoutHomePageComponent },
+  { path: 'payout/:transactionId', component: PayoutDetailPageComponent },
   { path: 'payment', component: PaymentHomePageComponent },
   { path: 'payment/:transactionId', component: PaymentDetailPageComponent },
   { path: 'audit', component: AuditHomePageComponent },

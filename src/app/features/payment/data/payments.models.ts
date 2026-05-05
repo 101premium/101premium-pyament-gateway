@@ -2,8 +2,10 @@
 export interface PaymentQueryParams {
   searchParam?: string;
   merchantId?: string;
+  cryptoMode?: string;
   page: number;
   size: number;
+  routePrefix?: string;
 }
 
 /** One element of `data.data` from GET …/transaction/page. */
@@ -29,6 +31,8 @@ export interface TransactionPageRecord {
   rail: string | null;
   checkoutUrl: string | null;
   createdDate: string;
+  cryptoMode: string | null;
+  address: string | null;
 }
 
 /** Inner `data` object: list + pagination. */
@@ -65,6 +69,7 @@ export interface TransactionDetailResponse {
 }
 
 export interface PaymentTransactionDetailView {
+  ref: string;
   reference: string;
   message: string;
   status: string;
@@ -83,6 +88,8 @@ export interface PaymentTransactionDetailView {
   redirectUrl: string;
   checkoutUrl: string;
   errorText: string;
+  cryptoMode: string;
+  address: string;
 }
 
 /** Result returned by `PaymentsService.getTransactions`. */
@@ -156,12 +163,21 @@ export interface PaymentWalletResponse {
 }
 
 export interface WalletStatusRequest {
+  reference: string;
   merchantId: string;
 }
 
 export interface WalletStatusResult {
-  code: string;
-  description: string;
+  amount: string;
+  currency: string;
+  ref: string;
+  transactionCompleted: string;
+  transactionId: string;
+  transactionStatus: string;
+  transactionType: string;
+  paymentReference: string;
+  address: string;
+  cryptoMode: string;
 }
 
 export interface WalletStatusResponse {

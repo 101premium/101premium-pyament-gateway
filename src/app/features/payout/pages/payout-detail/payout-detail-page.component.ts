@@ -3,28 +3,29 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { PaymentsService } from '../../data/payments.service';
+import { PaymentsService } from '../../../payment/data/payments.service';
+import { WalletStatusResult } from '../../../payment/data/payments.models';
 
 @Component({
-  selector: 'app-payment-detail-page',
+  selector: 'app-payout-detail-page',
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
     <main class="dashboard-main merchant-main grid gap-x-5 gap-y-4">
       <div class="flex items-center justify-between gap-4 border-b border-[rgba(138,158,191,0.16)] pb-2">
         <div class="grid gap-1">
-          <p class="m-0 text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-[#5b6c86]">Payments</p>
+          <p class="m-0 text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-[#5b6c86]">Payout</p>
           <h1 class="m-0 text-[clamp(1.45rem,2.2vw,1.85rem)] font-bold leading-[1.2] tracking-[-0.025em] text-[#2a3340]">
-            Transaction details
+            Payout details
           </h1>
         </div>
-        <a routerLink="/payment" class="rounded-full border border-[color-mix(in_srgb,var(--primary)_24%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--primary)]">
-          Back to payments
+        <a routerLink="/payout" class="rounded-full border border-[color-mix(in_srgb,var(--primary)_24%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--primary)]">
+          Back to payout
         </a>
       </div>
 
       <article *ngIf="isLoading()" class="merchant-panel rounded-[1.8rem] p-6">
-        <p class="m-0 text-sm text-[#61708a]">Loading transaction details...</p>
+        <p class="m-0 text-sm text-[#61708a]">Loading payout details...</p>
       </article>
 
       <article *ngIf="!isLoading() && errorMessage()" class="merchant-panel rounded-[1.8rem] border border-[#ffd7d3] bg-[#fff6f5] p-6">
@@ -43,7 +44,10 @@ import { PaymentsService } from '../../data/payments.service';
           </div>
 
           <dl class="mt-5 grid gap-0">
-            <div class="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] gap-4 border-t border-[rgba(138,158,191,0.14)] py-3 first:border-t-0 first:pt-0" *ngFor="let item of detailRows()">
+            <div
+              class="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] gap-4 border-t border-[rgba(138,158,191,0.14)] py-3 first:border-t-0 first:pt-0"
+              *ngFor="let item of detailRows()"
+            >
               <dt class="text-xs font-bold uppercase tracking-[0.06em] text-[#7a8aa3]">{{ item.label }}</dt>
               <dd class="m-0 break-words text-sm text-[#2a3340]">{{ item.value }}</dd>
             </div>
@@ -67,18 +71,49 @@ import { PaymentsService } from '../../data/payments.service';
               <span class="mt-1 block text-sm text-[#607089]">{{ transaction()!.createdDate }}</span>
             </div>
           </div>
+
+          <div class="mt-4 grid gap-3">
+            <button
+              type="button"
+              class="w-full rounded-full bg-[var(--primary)] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+              [disabled]="statusChecking()"
+              (click)="checkStatus()"
+            >
+              {{ statusChecking() ? 'Checking...' : 'Check Status' }}
+            </button>
+
+            <div
+              *ngIf="statusResult()"
+              class="rounded-[1rem] border border-[rgba(138,158,191,0.18)] bg-[#f8fbff] p-3"
+            >
+              <p class="m-0 mb-2.5 text-xs font-bold uppercase tracking-[0.1em] text-[#8fa0b8]">Status Result</p>
+              <dl class="grid gap-0">
+                <div *ngFor="let row of statusRows()" class="grid grid-cols-2 gap-2 border-t border-[rgba(138,158,191,0.12)] py-1.5 first:border-t-0 first:pt-0">
+                  <dt class="text-xs font-semibold text-[#8fa0b8]">{{ row.label }}</dt>
+                  <dd class="m-0 break-all text-right text-xs font-medium text-[#2a3340]">{{ row.value }}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <p *ngIf="statusError()" class="m-0 rounded-[1rem] border border-[#fde8e0] bg-[#fff6f5] p-3 text-sm text-[#b42318]">
+              {{ statusError() }}
+            </p>
+          </div>
         </aside>
       </section>
     </main>
   `
 })
-export class PaymentDetailPageComponent {
+export class PayoutDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly paymentsService = inject(PaymentsService);
 
   protected readonly transaction = signal<ReturnType<PaymentsService['mapTransactionDetailForView']> | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal('');
+  protected readonly statusChecking = signal(false);
+  protected readonly statusResult = signal<WalletStatusResult | null | undefined>(null);
+  protected readonly statusError = signal('');
 
   constructor() {
     const transactionId = this.route.snapshot.paramMap.get('transactionId') ?? '';
@@ -97,9 +132,7 @@ export class PaymentDetailPageComponent {
 
   protected detailRows(): { label: string; value: string }[] {
     const transaction = this.transaction();
-    if (!transaction) {
-      return [];
-    }
+    if (!transaction) return [];
 
     return [
       { label: 'Merchant', value: transaction.merchantName },
@@ -114,21 +147,54 @@ export class PaymentDetailPageComponent {
     ].filter(({ value }) => value && value !== 'Unavailable');
   }
 
+  protected statusRows(): { label: string; value: string }[] {
+    const s = this.statusResult() ?? null;
+    if (!s) return [];
+
+    return [
+      { label: 'Status', value: s.transactionCompleted },
+      { label: 'Amount', value: `${s.amount} ${s.currency}` },
+      { label: 'Mode', value: s.cryptoMode },
+      { label: 'Type', value: s.transactionType },
+      { label: 'Ref', value: s.ref },
+      { label: 'Transaction ID', value: s.transactionId },
+      { label: 'Payment Ref', value: s.paymentReference },
+      { label: 'Address', value: s.address }
+    ].filter(({ value }) => value?.trim());
+  }
+
+  protected checkStatus(): void {
+    const transaction = this.transaction();
+    if (!transaction) return;
+
+    this.statusChecking.set(true);
+    this.statusResult.set(null);
+    this.statusError.set('');
+
+    this.paymentsService
+      .checkWalletStatus({ reference: transaction.ref, merchantId: transaction.merchantId })
+      .pipe(finalize(() => this.statusChecking.set(false)))
+      .subscribe({
+        next: (result) => this.statusResult.set(result),
+        error: (error: unknown) => this.statusError.set(this.resolveStatusError(error))
+      });
+  }
+
+  private resolveStatusError(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      if (typeof error.error?.description === 'string' && error.error.description.trim()) return error.error.description;
+      if (error.status === 401) return 'Session expired. Please sign in again.';
+    }
+    return 'Unable to check transaction status right now.';
+  }
+
   private resolveErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
-      if (typeof error.error?.description === 'string' && error.error.description.trim()) {
-        return error.error.description;
-      }
-      if (error.status === 404) {
-        return 'Transaction not found.';
-      }
-      if (error.status === 401) {
-        return 'Payment session expired. Please sign in again.';
-      }
+      if (typeof error.error?.description === 'string' && error.error.description.trim()) return error.error.description;
+      if (error.status === 404) return 'Payout transaction not found.';
+      if (error.status === 401) return 'Payout session expired. Please sign in again.';
     }
-    if (error instanceof Error && error.message.trim()) {
-      return error.message;
-    }
-    return 'Unable to load this transaction right now.';
+    if (error instanceof Error && error.message.trim()) return error.message;
+    return 'Unable to load this payout right now.';
   }
 }
