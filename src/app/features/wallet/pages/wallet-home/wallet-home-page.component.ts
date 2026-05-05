@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { TablePaginationComponent } from '../../../../shared/components/table-pagination/table-pagination.component';
 import { WalletTransaction } from '../../data/wallet.models';
 import { WalletService } from '../../data/wallet.service';
@@ -10,7 +11,7 @@ import { WalletService } from '../../data/wallet.service';
 @Component({
   selector: 'app-wallet-home-page',
   standalone: true,
-  imports: [CommonModule, TablePaginationComponent],
+  imports: [CommonModule, TablePaginationComponent, AppModalComponent],
   template: `
     <main class="dashboard-main merchant-main grid gap-x-5 gap-y-3">
       <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-[rgba(138,158,191,0.16)] pb-1.5">
@@ -51,7 +52,8 @@ import { WalletService } from '../../data/wallet.service';
               <tbody>
                 <tr
                   *ngFor="let tx of transactions()"
-                  class="border-t border-[rgba(138,158,191,0.12)] transition-colors hover:bg-[#f8fbff]"
+                  class="cursor-pointer border-t border-[rgba(138,158,191,0.12)] transition-colors hover:bg-[#f8fbff]"
+                  (click)="openDetail(tx)"
                 >
                   <td class="px-5 py-4">
                     <div class="flex items-center gap-3">
@@ -98,6 +100,42 @@ import { WalletService } from '../../data/wallet.service';
         </div>
       </footer>
     </main>
+
+    <app-modal
+      *ngIf="selectedTx()"
+      title="Wallet Transaction"
+      eyebrow="Wallet"
+      titleId="wallet-detail-title"
+      [showActions]="false"
+      (dismiss)="closeDetail()"
+    >
+      <div class="grid gap-5">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#eef0ff] text-[0.8rem] font-bold text-[#2e39d3]">
+              {{ selectedTx()!.initials }}
+            </div>
+            <div>
+              <p class="m-0 max-w-[240px] truncate font-semibold text-[#2a3340]" [title]="selectedTx()!.address">
+                {{ selectedTx()!.address }}
+              </p>
+              <span class="text-xs text-[#607089]">{{ selectedTx()!.merchantName }}</span>
+            </div>
+          </div>
+          <span class="status-pill" [class]="selectedTx()!.cryptoModeClass">{{ selectedTx()!.cryptoMode }}</span>
+        </div>
+
+        <dl class="grid gap-0 rounded-[1.2rem] bg-[#f8fbff] p-4">
+          <div
+            *ngFor="let row of detailRows()"
+            class="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-3 border-t border-[rgba(138,158,191,0.12)] py-2.5 first:border-t-0 first:pt-0"
+          >
+            <dt class="text-xs font-bold uppercase tracking-[0.08em] text-[#8fa0b8]">{{ row.label }}</dt>
+            <dd class="m-0 break-all text-sm text-[#2a3340]">{{ row.value }}</dd>
+          </div>
+        </dl>
+      </div>
+    </app-modal>
   `
 })
 export class WalletHomePageComponent {
@@ -111,9 +149,37 @@ export class WalletHomePageComponent {
   protected readonly totalItems = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly selectedTx = signal<WalletTransaction | null>(null);
 
   constructor() {
     this.loadTransactions(0);
+  }
+
+  protected openDetail(tx: WalletTransaction): void {
+    this.selectedTx.set(tx);
+  }
+
+  protected closeDetail(): void {
+    this.selectedTx.set(null);
+  }
+
+  protected detailRows(): { label: string; value: string }[] {
+    const tx = this.selectedTx();
+    if (!tx) return [];
+
+    return [
+      { label: 'Reference', value: tx.ref },
+      { label: 'Amount', value: tx.amount },
+      { label: 'Currency', value: tx.currency },
+      { label: 'Address', value: tx.address },
+      { label: 'Merchant', value: tx.merchantName },
+      { label: 'Merchant ID', value: tx.merchantId },
+      { label: 'Transaction ID', value: tx.transactionId },
+      { label: 'Payment Ref', value: tx.paymentReference },
+      { label: 'Country', value: tx.countryCode },
+      { label: 'Rail', value: tx.rail },
+      { label: 'Date', value: tx.date }
+    ];
   }
 
   protected goToPreviousPage(): void {

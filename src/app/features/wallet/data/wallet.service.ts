@@ -47,11 +47,16 @@ function toWalletTransaction(row: WalletTransactionRecord): WalletTransaction {
     initials,
     address: row.address?.trim() || row.ref?.trim() || 'Unknown',
     merchantName: row.merchantName?.trim() || 'Unknown merchant',
+    merchantId: row.merchantId?.trim() || 'Unavailable',
     cryptoMode,
     cryptoModeClass: cryptoMode === 'CREDIT' ? 'successful' : 'pending',
     currency,
     amount: row.amount ? `${row.amount} ${currency}` : currency,
     date: formatDisplayDate(row.createdDate),
-    ref: row.ref?.trim() || ''
+    ref: row.ref?.trim() || 'Unavailable',
+    transactionId: row.transactionId?.trim() || 'Unavailable',
+    paymentReference: row.paymentReference?.trim() || 'Unavailable',
+    countryCode: row.countryCode?.trim() || 'Unavailable',
+    rail: row.rail?.trim() || 'Unavailable'
   };
 }

@@ -41,12 +41,17 @@ export interface WalletTransaction {
   initials: string;
   address: string;
   merchantName: string;
+  merchantId: string;
   cryptoMode: string;
   cryptoModeClass: string;
   currency: string;
   amount: string;
   date: string;
   ref: string;
+  transactionId: string;
+  paymentReference: string;
+  countryCode: string;
+  rail: string;
 }
 
 export interface WalletTransactionPageResult {
