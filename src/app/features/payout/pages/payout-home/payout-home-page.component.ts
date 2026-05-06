@@ -125,7 +125,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
           >
             <option value="">{{ networkLoading() ? 'Loading networks...' : 'Select network' }}</option>
             @for (network of networkOptions(); track network.network) {
-              <option [value]="network.network">{{ network.network }}</option>
+              <option [value]="network.network">{{ network.network }} ({{ network.name }})</option>
             }
           </select>
           <span *ngIf="networkError()" class="text-xs font-medium text-[#b42318]">{{ networkError() }}</span>

@@ -114,6 +114,7 @@ export interface PaymentAssetsResponse {
 export interface PaymentAssetNetwork {
   network: string;
   coin: string;
+  name: string;
 }
 
 export interface PaymentAssetNetworksResponse {
