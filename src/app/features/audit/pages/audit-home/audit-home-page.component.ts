@@ -11,11 +11,12 @@ import {
 import { TablePaginationComponent } from '../../../../shared/components/table-pagination/table-pagination.component';
 import { MerchantSearchService } from '../../../../shared/services/merchant-search.service';
 import { AuditService } from '../../data/audit.service';
+import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 @Component({
   selector: 'app-audit-home-page',
   standalone: true,
-  imports: [CommonModule, SummaryTableComponent, TablePaginationComponent],
+  imports: [CommonModule, SummaryTableComponent, TablePaginationComponent, PageFooterComponent],
   template: `
     <main class="dashboard-main merchant-main grid gap-x-5 gap-y-3">
       <div
@@ -60,14 +61,7 @@ import { AuditService } from '../../data/audit.service';
         </app-summary-table>
       </section>
 
-      <footer class="merchant-footer">
-        <span>© 2023 PayStream Technologies. All rights reserved.</span>
-        <div>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">API Docs</a>
-        </div>
-      </footer>
+      <app-page-footer />
     </main>
   `
 })

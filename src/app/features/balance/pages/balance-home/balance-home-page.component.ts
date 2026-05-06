@@ -14,6 +14,7 @@ import { PaymentAsset, PaymentAssetNetwork, PaymentWallet } from '../../../payme
 import { PaymentsService } from '../../../payment/data/payments.service';
 import { BalanceRow } from '../../data/balance.models';
 import { BalanceService } from '../../data/balance.service';
+import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 @Component({
   selector: 'app-balance-home-page',
@@ -23,7 +24,8 @@ import { BalanceService } from '../../data/balance.service';
     ReactiveFormsModule,
     AppModalComponent,
     SummaryTableComponent,
-    TablePaginationComponent
+    TablePaginationComponent,
+    PageFooterComponent
   ],
   template: `
     <main class="dashboard-main merchant-main grid gap-x-5 gap-y-3">
@@ -133,14 +135,7 @@ import { BalanceService } from '../../data/balance.service';
         </app-summary-table>
       </section>
 
-      <footer class="merchant-footer">
-        <span>© 2023 PayStream Technologies. All rights reserved.</span>
-        <div>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">API Docs</a>
-        </div>
-      </footer>
+      <app-page-footer />
     </main>
 
     <app-modal

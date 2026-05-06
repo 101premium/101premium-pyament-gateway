@@ -14,11 +14,12 @@ import { PaymentTransaction } from '../../../payment/data/payments.models';
 import { PaymentsService } from '../../../payment/data/payments.service';
 import { DashboardService } from '../../data/dashboard.service';
 import { DashboardStatsData } from '../../data/dashboard.models';
+import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 @Component({
   selector: 'app-dashboard-home-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, StableCoinWalletModalComponent, SummaryTableComponent],
+  imports: [CommonModule, RouterLink, StableCoinWalletModalComponent, SummaryTableComponent, PageFooterComponent],
   template: `
     <main class="dashboard-main merchant-main">
         <section class="merchant-stats">
@@ -110,14 +111,7 @@ import { DashboardStatsData } from '../../data/dashboard.models';
           />
         </section>
 
-        <footer class="merchant-footer">
-          <span>© 2023 PayStream Technologies. All rights reserved.</span>
-          <div>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">API Docs</a>
-          </div>
-        </footer>
+        <app-page-footer />
     </main>
 
     <app-stable-coin-wallet-modal

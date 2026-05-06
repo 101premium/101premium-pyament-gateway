@@ -14,13 +14,14 @@ import { MerchantSearchService } from '../../../../shared/services/merchant-sear
 import { RolesService } from '../../data/roles.service';
 import { UsersService } from '../../data/users.service';
 import { RoleStatData, UserStatData } from '../../data/users.models';
+import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 type UserTab = 'users' | 'roles';
 
 @Component({
   selector: 'app-user-home-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, SummaryTableComponent, TablePaginationComponent],
+  imports: [CommonModule, RouterLink, SummaryTableComponent, TablePaginationComponent, PageFooterComponent],
   template: `
     <main class="dashboard-main merchant-main grid gap-x-5 gap-y-3">
       <div
@@ -186,14 +187,7 @@ type UserTab = 'users' | 'roles';
         </app-summary-table>
       </section>
 
-      <footer class="merchant-footer">
-        <span>© 2023 PayStream Technologies. All rights reserved.</span>
-        <div>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">API Docs</a>
-        </div>
-      </footer>
+      <app-page-footer />
     </main>
   `
 })

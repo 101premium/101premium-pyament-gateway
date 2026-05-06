@@ -13,11 +13,12 @@ import { TablePaginationComponent } from '../../../../shared/components/table-pa
 import { MerchantSearchService } from '../../../../shared/services/merchant-search.service';
 import { MerchantStatData } from '../../data/merchant.models';
 import { MerchantService } from '../../data/merchant.service';
+import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 @Component({
   selector: 'app-merchant-home-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, SummaryTableComponent, TablePaginationComponent],
+  imports: [CommonModule, RouterLink, SummaryTableComponent, TablePaginationComponent, PageFooterComponent],
   template: `
     <main class="dashboard-main merchant-main grid gap-x-5 gap-y-3">
       <div
@@ -95,13 +96,7 @@ import { MerchantService } from '../../data/merchant.service';
         </app-summary-table>
       </section>
 
-      <footer class="merchant-footer">
-        <span>© 2023 PayStream Technologies. All rights reserved.</span>
-        <div>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-        </div>
-      </footer>
+      <app-page-footer />
     </main>
   `
 })

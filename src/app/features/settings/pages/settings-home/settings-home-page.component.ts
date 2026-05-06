@@ -6,11 +6,12 @@ import { AuthSession } from '../../../auth/data/auth.models';
 import { MerchantSearchService } from '../../../../shared/services/merchant-search.service';
 import { titleCase } from '../../../../shared/utils/format.utils';
 import { SettingsService } from '../../data/settings.service';
+import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 @Component({
   selector: 'app-settings-home-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, PageFooterComponent],
   template: `
     <main class="dashboard-main merchant-main grid max-w-[960px] gap-x-5 gap-y-5">
       <div *ngIf="passwordJustUpdated()" class="settings-pwd-toast" role="status">
@@ -137,13 +138,7 @@ import { SettingsService } from '../../data/settings.service';
         </div>
       </article>
 
-      <footer class="merchant-footer">
-        <span>© 2023 PayStream Technologies. All rights reserved.</span>
-        <div>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-        </div>
-      </footer>
+      <app-page-footer />
     </main>
   `,
   styles: `

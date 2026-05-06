@@ -13,6 +13,7 @@ import { TablePaginationComponent } from '../../../../shared/components/table-pa
 import { MerchantSearchService } from '../../../../shared/services/merchant-search.service';
 import { PaymentAsset, PaymentAssetNetwork, PaymentTransaction } from '../../../payment/data/payments.models';
 import { PaymentsService } from '../../../payment/data/payments.service';
+import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 @Component({
   selector: 'app-payout-home-page',
@@ -22,7 +23,8 @@ import { PaymentsService } from '../../../payment/data/payments.service';
     ReactiveFormsModule,
     AppModalComponent,
     SummaryTableComponent,
-    TablePaginationComponent
+    TablePaginationComponent,
+    PageFooterComponent
   ],
   template: `
     <main class="dashboard-main merchant-main grid gap-x-5 gap-y-3">
@@ -78,14 +80,7 @@ import { PaymentsService } from '../../../payment/data/payments.service';
         </app-summary-table>
       </section>
 
-      <footer class="merchant-footer">
-        <span>© 2023 PayStream Technologies. All rights reserved.</span>
-        <div>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">API Docs</a>
-        </div>
-      </footer>
+      <app-page-footer />
     </main>
 
     <app-modal

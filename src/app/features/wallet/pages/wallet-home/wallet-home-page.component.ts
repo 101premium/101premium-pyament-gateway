@@ -7,11 +7,12 @@ import { AppModalComponent } from '../../../../shared/components/app-modal/app-m
 import { TablePaginationComponent } from '../../../../shared/components/table-pagination/table-pagination.component';
 import { WalletTransaction } from '../../data/wallet.models';
 import { WalletService } from '../../data/wallet.service';
+import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 @Component({
   selector: 'app-wallet-home-page',
   standalone: true,
-  imports: [CommonModule, TablePaginationComponent, AppModalComponent],
+  imports: [CommonModule, TablePaginationComponent, AppModalComponent, PageFooterComponent],
   template: `
     <main class="dashboard-main merchant-main grid gap-x-5 gap-y-3">
       <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-[rgba(138,158,191,0.16)] pb-1.5">
@@ -91,14 +92,7 @@ import { WalletService } from '../../data/wallet.service';
         </article>
       </section>
 
-      <footer class="merchant-footer">
-        <span>© 2023 PayStream Technologies. All rights reserved.</span>
-        <div>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">API Docs</a>
-        </div>
-      </footer>
+      <app-page-footer />
     </main>
 
     <app-modal
