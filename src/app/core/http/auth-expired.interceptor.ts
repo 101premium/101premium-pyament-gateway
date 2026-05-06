@@ -23,13 +23,14 @@ export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
       if (
         isApiRequest &&
         !isPasswordActivationRequest &&
+        isPlatformBrowser(platformId) &&
         error instanceof HttpErrorResponse &&
         error.status === 401
       ) {
         authService.logout();
         toast.show('Access denied. Please sign in again.', 'error');
 
-        if (isPlatformBrowser(platformId) && window.location.pathname !== '/auth/login') {
+        if (window.location.pathname !== '/auth/login') {
           void router.navigateByUrl('/auth/login').catch(() => {
             window.location.assign('/auth/login');
           });
