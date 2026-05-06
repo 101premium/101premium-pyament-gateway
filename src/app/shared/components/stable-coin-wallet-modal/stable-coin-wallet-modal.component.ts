@@ -103,7 +103,7 @@ import { AppModalComponent } from '../app-modal/app-modal.component';
           </button>
           <button
             type="button"
-            class="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#2e39d3] bg-[#2e39d3] px-3 text-sm font-bold text-white transition hover:bg-[#2630b8]"
+            class="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-3 text-sm font-bold text-white transition hover:bg-[#15803d]"
             (click)="copyWalletDetails()"
           >
             Copy All
@@ -126,7 +126,7 @@ import { AppModalComponent } from '../app-modal/app-modal.component';
           *ngIf="!walletResult()"
           type="submit"
           form="stable-coin-wallet-form"
-          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#2e39d3] bg-[#2e39d3] px-4 text-sm font-bold text-white transition hover:bg-[#2630b8] disabled:cursor-not-allowed disabled:opacity-65"
+          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-4 text-sm font-bold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-65"
           [disabled]="walletSubmitting()"
         >
           {{ walletSubmitting() ? 'Generating...' : 'Generate wallet' }}

@@ -33,7 +33,7 @@ import { Component, input, output } from '@angular/core';
 
           <button
             type="button"
-            class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[rgba(138,158,191,0.2)] bg-white text-[#667792] transition hover:bg-[#f5f7fb] hover:text-[#2e39d3]"
+            class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[rgba(138,158,191,0.2)] bg-white text-[#667792] transition hover:bg-[#f5f7fb] hover:text-[#16a34a]"
             [attr.aria-label]="closeLabel()"
             (click)="close()"
           >

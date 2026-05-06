@@ -15,7 +15,7 @@ export function formatMoney(amount: string, currencyCode: string): string {
   return trimmed;
 }
 
-/** Formats a number as currency (ISO 4217 code). Falls back to `$` + fixed decimals if `Intl` rejects the code. */
+/** Formats a number as currency (ISO 4217 code). Falls back to `<amount> <code>` for non-standard codes (e.g. crypto). */
 export function formatCurrencyAmount(value: number, currencyCode: string): string {
   try {
     return new Intl.NumberFormat('en-US', {
@@ -25,7 +25,7 @@ export function formatCurrencyAmount(value: number, currencyCode: string): strin
       maximumFractionDigits: 2
     }).format(value);
   } catch {
-    return `$${value.toFixed(2)}`;
+    return `${value.toFixed(2)} ${currencyCode}`;
   }
 }
 

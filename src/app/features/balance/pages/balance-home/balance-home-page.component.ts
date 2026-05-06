@@ -44,14 +44,14 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
         <div class="flex flex-wrap gap-2">
           <button
             type="button"
-            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#2e39d3] bg-[#2e39d3] px-4 text-sm font-bold text-white transition hover:bg-[#2630b8]"
+            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-4 text-sm font-bold text-white transition hover:bg-[#15803d]"
             (click)="openWalletModal()"
           >
             Generate stable coin wallet
           </button>
           <button
             type="button"
-            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#2e39d3] bg-[#2e39d3] px-4 text-sm font-bold text-white transition hover:bg-[#2630b8]"
+            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-4 text-sm font-bold text-white transition hover:bg-[#15803d]"
             [attr.aria-pressed]="showBalances()"
             (click)="toggleBalanceVisibility()"
           >
@@ -90,7 +90,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
         <div class="flex gap-2">
           <button
             type="button"
-            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#2e39d3] bg-[#2e39d3] px-4 text-sm font-bold text-white transition hover:bg-[#2630b8]"
+            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-4 text-sm font-bold text-white transition hover:bg-[#15803d]"
             [disabled]="isLoading()"
             (click)="applyFilters()"
           >
@@ -98,7 +98,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
           </button>
           <button
             type="button"
-            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[rgba(138,158,191,0.24)] bg-white px-4 text-sm font-bold text-[#52627c] transition hover:bg-[#f5f7fb]"
+            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-4 text-sm font-bold text-white transition hover:bg-[#15803d]"
             [disabled]="isLoading()"
             (click)="clearFilters()"
           >
@@ -225,7 +225,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
           </button>
           <button
             type="button"
-            class="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#2e39d3] bg-[#2e39d3] px-3 text-sm font-bold text-white transition hover:bg-[#2630b8]"
+            class="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-3 text-sm font-bold text-white transition hover:bg-[#15803d]"
             (click)="copyWalletDetails()"
           >
             Copy All
@@ -248,7 +248,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
           *ngIf="!walletResult()"
           type="submit"
           form="wallet-form"
-          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#2e39d3] bg-[#2e39d3] px-4 text-sm font-bold text-white transition hover:bg-[#2630b8] disabled:cursor-not-allowed disabled:opacity-65"
+          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-4 text-sm font-bold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-65"
           [disabled]="walletSubmitting()"
         >
           {{ walletSubmitting() ? 'Generating...' : 'Generate wallet' }}

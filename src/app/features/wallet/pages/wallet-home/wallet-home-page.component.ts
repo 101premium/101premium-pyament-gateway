@@ -58,7 +58,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
                 >
                   <td class="px-5 py-4">
                     <div class="flex items-center gap-3">
-                      <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eef0ff] text-[0.7rem] font-bold text-[#2e39d3]">
+                      <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eef0ff] text-[0.7rem] font-bold text-[#16a34a]">
                         {{ tx.initials }}
                       </div>
                       <span class="max-w-[200px] truncate font-medium text-[#2a3340]" [title]="tx.address">
@@ -106,7 +106,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
       <div class="grid gap-5">
         <div class="flex items-center justify-between gap-4">
           <div class="flex items-center gap-3">
-            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#eef0ff] text-[0.8rem] font-bold text-[#2e39d3]">
+            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#eef0ff] text-[0.8rem] font-bold text-[#16a34a]">
               {{ selectedTx()!.initials }}
             </div>
             <div>

@@ -67,9 +67,9 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
               @if (item.children?.length) {
                 <div class="grid gap-1">
                   <a
-                    class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#2e39d3]"
+                    class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#16a34a]"
                     [routerLink]="item.link"
-                    routerLinkActive="bg-[#eef0ff] text-[#2e39d3]"
+                    routerLinkActive="bg-[#eef0ff] text-[#16a34a]"
                     [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
                     (click)="closeSidebarOnMobile()"
                   >
@@ -82,9 +82,9 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
                   <div class="ml-8 grid gap-1 border-l border-[rgba(138,158,191,0.16)] pl-3">
                     @for (child of item.children; track child.label) {
                       <a
-                        class="flex min-h-10 w-full items-center rounded-xl px-3 py-2 text-left text-[0.95rem] font-semibold text-[#7b8ba6] no-underline transition duration-200 ease-out hover:bg-[#f3f4ff] hover:text-[#2e39d3]"
+                        class="flex min-h-10 w-full items-center rounded-xl px-3 py-2 text-left text-[0.95rem] font-semibold text-[#7b8ba6] no-underline transition duration-200 ease-out hover:bg-[#f3f4ff] hover:text-[#16a34a]"
                         [routerLink]="child.link"
-                        routerLinkActive="bg-[#eef0ff] text-[#2e39d3]"
+                        routerLinkActive="bg-[#eef0ff] text-[#16a34a]"
                         [routerLinkActiveOptions]="{ exact: child.exact ?? false }"
                         (click)="closeSidebarOnMobile()"
                       >
@@ -95,9 +95,9 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
                 </div>
               } @else if (item.link) {
                 <a
-                  class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#2e39d3]"
+                  class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#16a34a]"
                   [routerLink]="item.link"
-                  routerLinkActive="bg-[#eef0ff] text-[#2e39d3]"
+                  routerLinkActive="bg-[#eef0ff] text-[#16a34a]"
                   [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
                   (click)="closeSidebarOnMobile()"
                 >
@@ -108,7 +108,7 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
                 </a>
               } @else {
                 <a
-                  class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#2e39d3]"
+                  class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#16a34a]"
                   href="#"
                   (click)="$event.preventDefault()"
                 >
@@ -126,7 +126,7 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
           <p class="m-0 text-[0.78rem] font-bold uppercase tracking-[0.24em] text-[#91a0bb]">Support</p>
           <nav class="grid gap-[0.45rem]">
             <a
-              class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#2e39d3]"
+              class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#16a34a]"
               *ngFor="let item of supportItems"
               href="#"
               (click)="handleSupportItemClick($event, item.action)"

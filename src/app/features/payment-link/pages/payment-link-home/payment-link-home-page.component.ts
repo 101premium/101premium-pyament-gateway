@@ -18,7 +18,7 @@ import { Component } from '@angular/core';
 
       <section class="merchant-panel grid min-h-[22rem] place-items-center rounded-[1.8rem] p-8 text-center">
         <div class="grid max-w-[30rem] gap-4">
-          <div class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#eef0ff] text-[#2e39d3]" aria-hidden="true">
+          <div class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#eef0ff] text-[#16a34a]" aria-hidden="true">
             <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <path d="M10.5 13.5 13.5 10.5" />
               <path d="M8.25 15.75 6.9 17.1a3.75 3.75 0 0 1-5.3-5.3l2.65-2.65a3.75 3.75 0 0 1 5.3 0" />
