@@ -1,6 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../../features/auth/data/auth.service';
+import { AppModeService } from '../services/app-mode.service';
 import { environment } from '../../../environments/environment';
 
 export const authHeadersInterceptor: HttpInterceptorFn = (req, next) => {
@@ -10,6 +11,7 @@ export const authHeadersInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const authService = inject(AuthService);
+  const appMode = inject(AppModeService);
   const session = authService.getSession();
   const isAuthEndpoint = req.url.startsWith(`${environment.apiBaseUrl}/auth/`);
 
@@ -20,7 +22,7 @@ export const authHeadersInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   if (!headers.has('appMode')) {
-    headers = headers.set('appMode', '0');
+    headers = headers.set('appMode', String(appMode.mode()));
   }
 
   if (!isAuthEndpoint && session?.accessToken && !headers.has('Authorization')) {

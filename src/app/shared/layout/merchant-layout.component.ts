@@ -3,6 +3,7 @@ import { Component, HostListener, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../features/auth/data/auth.service';
+import { AppModeService } from '../../core/services/app-mode.service';
 import { MerchantSearchService } from '../services/merchant-search.service';
 import { initialsFromName, titleCase } from '../utils/format.utils';
 import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.component';
@@ -200,6 +201,22 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
           >
             <button
               type="button"
+              class="inline-flex h-[2.1rem] cursor-pointer items-center gap-[0.45rem] rounded-full border px-3 text-[0.78rem] font-bold tracking-wide transition-colors duration-200"
+              [class]="appMode.isLive
+                ? 'border-[#16a34a] bg-[#f0fdf4] text-[#16a34a]'
+                : 'border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]'"
+              [attr.aria-label]="appMode.isLive ? 'Switch to Test mode' : 'Switch to Live mode'"
+              (click)="appMode.toggle()"
+            >
+              <span
+                class="inline-block h-2 w-2 rounded-full"
+                [class]="appMode.isLive ? 'bg-[#16a34a]' : 'bg-[#9ca3af]'"
+              ></span>
+              {{ appMode.isLive ? 'LIVE' : 'TEST' }}
+            </button>
+
+            <button
+              type="button"
               class="inline-flex h-[2.7rem] w-[2.7rem] cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-[1.1rem] text-[#5e6f8f] hover:not-disabled:bg-[color-mix(in_srgb,var(--primary)_8%,transparent)] hover:not-disabled:text-[var(--primary)] [&_svg]:size-[1.35rem]"
               aria-label="Notifications"
             >
@@ -329,6 +346,11 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
             <path d="M16 12a2 2 0 0 1 2-2h3v4h-3a2 2 0 0 1-2-2Z" />
           </svg>
         }
+        @case ('key') {
+          <svg class="nav-icon__svg size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+          </svg>
+        }
         @case ('question-mark-circle') {
           <svg class="nav-icon__svg size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 18h.008v.008H12V18Z" />
@@ -351,6 +373,7 @@ export class MerchantLayoutComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   protected readonly merchantSearch = inject(MerchantSearchService);
+  protected readonly appMode = inject(AppModeService);
 
   protected readonly helpPanelOpen = signal(false);
   protected readonly sidebarOpen = signal(false);
@@ -435,9 +458,11 @@ export class MerchantLayoutComponent {
           'ROLE_VIEW_USERS','ROLE_CREATE_USERS'
         ]
       },
-      { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit', 
+      { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit',
         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_AUDIT'] },
-      { label: 'Settings', icon: 'cog', link: '/settings', 
+      { label: 'API Keys', icon: 'key', link: '/api-keys',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
+      { label: 'Settings', icon: 'cog', link: '/settings',
         permission: [] }
     ];
 

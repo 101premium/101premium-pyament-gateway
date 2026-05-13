@@ -14,6 +14,7 @@ import { MerchantSearchService } from '../../../../shared/services/merchant-sear
 import { PaymentAsset, PaymentAssetNetwork, PaymentTransaction } from '../../../payment/data/payments.models';
 import { PaymentsService } from '../../../payment/data/payments.service';
 import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
+import { AuthService } from '../../../../features/auth/data/auth.service';
 
 @Component({
   selector: 'app-payout-home-page',
@@ -37,6 +38,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
         </div>
 
         <button
+          *ngIf="canInitiatePayout()"
           type="button"
           class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#16803c] bg-[#1c7f3d] px-4 text-sm font-bold text-white transition hover:bg-[#146b33]"
           (click)="initiatePayout()"
@@ -191,7 +193,13 @@ export class PayoutHomePageComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly paymentsService = inject(PaymentsService);
   private readonly merchantSearch = inject(MerchantSearchService);
+  private readonly authService = inject(AuthService);
   protected readonly pageSize = 10;
+
+  protected canInitiatePayout(): boolean {
+    const permissions = this.authService.getSession()?.permissions ?? [];
+    return permissions.includes('ROLE_MERCHANT_ADMIN');
+  }
 
   protected readonly payoutForm = this.fb.nonNullable.group({
     amount: [0, [Validators.required, Validators.min(0.01)]],
@@ -261,6 +269,7 @@ export class PayoutHomePageComponent {
   }
 
   protected initiatePayout(): void {
+    if (!this.canInitiatePayout()) return;
     if (!this.coinOptions().length && !this.assetLoading()) {
       this.loadPaymentAssets();
     }

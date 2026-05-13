@@ -21,6 +21,7 @@ import { ChangePasswordPageComponent } from '../../features/settings/pages/chang
 import { MerchantHomePageComponent } from '../../features/merchant/pages/merchant-home/merchant-home-page.component';
 import { MerchantDetailPageComponent } from '../../features/merchant/pages/merchant-detail/merchant-detail-page.component';
 import { AddMerchantPageComponent } from '../../features/merchant/pages/add-merchant/add-merchant-page.component';
+import { ApiKeyHomePageComponent } from '../../features/api-key/pages/api-key-home/api-key-home-page.component';
 
 /** Child routes rendered inside `MerchantLayoutComponent` (`<router-outlet />`). */
 export const merchantLayoutRoutes: Routes = [
@@ -42,6 +43,7 @@ export const merchantLayoutRoutes: Routes = [
   { path: 'teams/users/new', component: AddUserPageComponent },
   { path: 'teams/users/:uniqueId', component: UserDetailPageComponent },
   { path: 'teams/roles/new', component: AddRolePageComponent },
+  { path: 'api-keys', component: ApiKeyHomePageComponent },
   { path: 'settings/change-password', component: ChangePasswordPageComponent },
   { path: 'settings', component: SettingsHomePageComponent },
   { path: 'invoice/create', component: CreateInvoicePageComponent },

@@ -12,20 +12,14 @@ export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const toast = inject(ToastService);
   const platformId = inject(PLATFORM_ID);
-  const isPasswordActivationRequest = req.url.startsWith(
-    `${environment.apiBaseUrl}/user/passwordactivation`
-  );
 
   return next(req).pipe(
     catchError((error: unknown) => {
-      const isApiRequest = req.url.startsWith(environment.apiBaseUrl);
-
       if (
-        isApiRequest &&
-        !isPasswordActivationRequest &&
         isPlatformBrowser(platformId) &&
         error instanceof HttpErrorResponse &&
-        error.status === 401
+        error.status === 401 &&
+        isProtectedApiRequest(req.url)
       ) {
         authService.logout();
         toast.show('Access denied. Please sign in again.', 'error');
@@ -43,3 +37,34 @@ export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 };
+
+function isProtectedApiRequest(url: string): boolean {
+  const requestPath = pathForUrl(url);
+
+  if (!requestPath) {
+    return false;
+  }
+
+  const apiBasePath = pathForUrl(environment.apiBaseUrl)?.replace(/\/+$/, '') ?? '';
+  const isApiRequest =
+    url.startsWith(environment.apiBaseUrl) ||
+    requestPath === apiBasePath ||
+    requestPath.startsWith(`${apiBasePath}/`);
+
+  if (!isApiRequest) {
+    return false;
+  }
+
+  return ![
+    `${apiBasePath}/auth/login`,
+    `${apiBasePath}/user/passwordactivation`
+  ].some((excludedPath) => requestPath.startsWith(excludedPath));
+}
+
+function pathForUrl(url: string): string | null {
+  try {
+    return new URL(url, environment.apiBaseUrl).pathname;
+  } catch {
+    return null;
+  }
+}

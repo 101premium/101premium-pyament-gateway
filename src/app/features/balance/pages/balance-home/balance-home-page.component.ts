@@ -15,6 +15,7 @@ import { PaymentsService } from '../../../payment/data/payments.service';
 import { BalanceRow } from '../../data/balance.models';
 import { BalanceService } from '../../data/balance.service';
 import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
+import { AuthService } from '../../../../features/auth/data/auth.service';
 
 @Component({
   selector: 'app-balance-home-page',
@@ -43,6 +44,7 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
 
         <div class="flex flex-wrap gap-2">
           <button
+            *ngIf="canGenerateWallet()"
             type="button"
             class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#16a34a] bg-[#16a34a] px-4 text-sm font-bold text-white transition hover:bg-[#15803d]"
             (click)="openWalletModal()"
@@ -282,7 +284,13 @@ export class BalanceHomePageComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly balanceService = inject(BalanceService);
   private readonly paymentsService = inject(PaymentsService);
+  private readonly authService = inject(AuthService);
   protected readonly pageSize = 10;
+
+  protected canGenerateWallet(): boolean {
+    const permissions = this.authService.getSession()?.permissions ?? [];
+    return permissions.includes('ROLE_MERCHANT_ADMIN');
+  }
   protected readonly searchParamControl = new FormControl('', { nonNullable: true });
   protected readonly merchantIdControl = new FormControl('', { nonNullable: true });
   protected readonly walletForm = this.fb.nonNullable.group({
@@ -367,6 +375,7 @@ export class BalanceHomePageComponent {
   }
 
   protected openWalletModal(): void {
+    if (!this.canGenerateWallet()) return;
     if (!this.coinOptions().length && !this.assetLoading()) {
       this.loadPaymentAssets();
     }
