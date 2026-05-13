@@ -26,6 +26,7 @@ export interface SummaryTableHeaders {
   status?: string;
   amount?: string;
   meta?: string;
+  transactionType?: string;
 }
 
 @Component({

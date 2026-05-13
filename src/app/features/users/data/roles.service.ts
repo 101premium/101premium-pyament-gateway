@@ -78,14 +78,7 @@ export class RolesService {
   }
 
   getPermissions(): Observable<PermissionOption[]> {
-    let params = new HttpParams();
-    const permissionType = this.authService.getSession()?.userCategory?.trim();
-
-    if (permissionType) {
-      params = params.set('permissionType', permissionType);
-    }
-
-    return this.http.get<PermissionListResponse>(this.permissionListUrl, { params }).pipe(
+    return this.http.get<PermissionListResponse>(this.permissionListUrl).pipe(
       map((response) => response.data.map(mapPermissionOption))
     );
   }

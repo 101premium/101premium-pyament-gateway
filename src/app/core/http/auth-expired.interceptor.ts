@@ -31,7 +31,9 @@ export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
         toast.show('Access denied. Please sign in again.', 'error');
 
         if (window.location.pathname !== '/auth/login') {
-          void router.navigateByUrl('/auth/login').catch(() => {
+          router.navigateByUrl('/auth/login').then((navigated) => {
+            if (!navigated) window.location.assign('/auth/login');
+          }, () => {
             window.location.assign('/auth/login');
           });
         }

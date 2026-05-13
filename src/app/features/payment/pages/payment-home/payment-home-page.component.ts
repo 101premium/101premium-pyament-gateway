@@ -81,6 +81,7 @@ export class PaymentHomePageComponent {
     primary: 'Customer',
     status: 'Status',
     amount: 'Amount',
+    transactionType: "Transaction Type",
     meta: 'Date'
   };
 

@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, inject, output, signal } from '@angular/core';
+import { Component, DestroyRef, inject, output, PLATFORM_ID, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import QRCode from 'qrcode';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { distinctUntilChanged, finalize } from 'rxjs';
@@ -30,6 +32,26 @@ import { AppModalComponent } from '../app-modal/app-modal.component';
         [formGroup]="walletForm"
         (ngSubmit)="submit()"
       >
+        <label class="grid gap-1.5">
+          <span class="text-sm font-semibold text-[#42526b]">First Name</span>
+          <input
+            type="text"
+            class="min-h-11 rounded-xl border border-[rgba(138,158,191,0.24)] bg-[#f8fbff] px-3 text-sm text-[#24324d] outline-none"
+            formControlName="firstName"
+            placeholder="John"
+          />
+        </label>
+
+        <label class="grid gap-1.5">
+          <span class="text-sm font-semibold text-[#42526b]">Last Name</span>
+          <input
+            type="text"
+            class="min-h-11 rounded-xl border border-[rgba(138,158,191,0.24)] bg-[#f8fbff] px-3 text-sm text-[#24324d] outline-none"
+            formControlName="lastName"
+            placeholder="Doe"
+          />
+        </label>
+
         <label class="grid gap-1.5 md:col-span-2">
           <span class="text-sm font-semibold text-[#42526b]">Customer Email</span>
           <input
@@ -84,13 +106,39 @@ import { AppModalComponent } from '../app-modal/app-modal.component';
       </form>
 
       <div *ngIf="walletResult()" class="grid gap-3 rounded-[1.2rem] bg-[#f8fbff] p-4 text-sm text-[#607089]">
+        <div *ngIf="walletQrCode()" class="flex justify-center">
+          <img [src]="walletQrCode()" alt="Wallet address QR code" width="180" height="180" class="rounded-xl" />
+        </div>
         <div>
           <span class="block text-xs font-bold uppercase tracking-[0.14em] text-[#91a0bb]">Wallet Address</span>
-          <strong class="mt-1 block break-all text-[#2f3743]">{{ walletResult()!.address }}</strong>
+          <div class="mt-1 flex items-start gap-2">
+            <strong class="flex-1 break-all text-[#2f3743]">{{ walletResult()!.address }}</strong>
+            <button
+              type="button"
+              class="shrink-0 rounded-lg border border-[rgba(138,158,191,0.24)] bg-white px-2 py-1 text-xs font-bold text-[#52627c] transition hover:bg-[#f5f7fb]"
+              (click)="copyWalletAddress()"
+            >Copy</button>
+          </div>
         </div>
         <div class="grid gap-2 md:grid-cols-2">
           <span>{{ walletResult()!.currency }} · {{ walletResult()!.network }}</span>
-          <span>{{ walletResult()!.message }}</span>
+          <span>{{ walletResult()!.transactionType | uppercase }}</span>
+        </div>
+        <div class="grid gap-2 md:grid-cols-2">
+          <div>
+            <span class="block text-xs font-bold uppercase tracking-[0.14em] text-[#91a0bb]">Mode</span>
+            <span class="mt-0.5 block text-sm font-semibold text-[#2f3743]">{{ walletResult()!.mode }}</span>
+          </div>
+          <div>
+            <span class="block text-xs font-bold uppercase tracking-[0.14em] text-[#91a0bb]">Transaction ID</span>
+            <span class="mt-0.5 block break-all text-sm text-[#2f3743]">{{ walletResult()!.transactionId }}</span>
+          </div>
+        </div>
+        <div *ngIf="expiryCountdown()" class="flex items-center gap-2 rounded-xl border border-[rgba(138,158,191,0.2)] bg-white px-3 py-2">
+          <span class="text-xs font-bold uppercase tracking-[0.1em] text-[#91a0bb]">Expires in</span>
+          <span class="font-mono text-sm font-bold" [class.text-[#b42318]]="expiryCountdown() === 'Expired'" [class.text-[#1c7f3d]]="expiryCountdown() !== 'Expired'">
+            {{ expiryCountdown() }}
+          </span>
         </div>
         <p class="m-0 text-xs font-medium text-[#b54708]">{{ walletResult()!.notice }}</p>
         <div class="flex flex-wrap gap-2 pt-1">
@@ -139,11 +187,14 @@ export class StableCoinWalletModalComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly paymentsService = inject(PaymentsService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly dismiss = output<void>();
   readonly generated = output<PaymentWallet>();
 
   protected readonly walletForm = this.fb.nonNullable.group({
+    firstName: ['', Validators.required],
+    lastName: ['', Validators.required],
     customEmail: ['', [Validators.required, Validators.email]],
     coin: ['', Validators.required],
     network: ['', Validators.required]
@@ -159,6 +210,9 @@ export class StableCoinWalletModalComponent {
   protected readonly walletResult = signal<PaymentWallet | null>(null);
   protected readonly copyMessage = signal('');
   protected readonly copyError = signal('');
+  protected readonly walletQrCode = signal('');
+  protected readonly expiryCountdown = signal('');
+  private expiryTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.loadPaymentAssets();
@@ -179,6 +233,7 @@ export class StableCoinWalletModalComponent {
 
   protected close(): void {
     if (!this.walletSubmitting()) {
+      if (this.expiryTimer) clearInterval(this.expiryTimer);
       this.dismiss.emit();
     }
   }
@@ -210,6 +265,12 @@ export class StableCoinWalletModalComponent {
           this.walletResult.set(wallet);
           if (wallet) {
             this.generated.emit(wallet);
+            if (isPlatformBrowser(this.platformId)) {
+              QRCode.toDataURL(wallet.address, { width: 180, margin: 1 })
+                .then((url) => this.walletQrCode.set(url))
+                .catch(() => this.walletQrCode.set(''));
+              this.startExpiryCountdown(wallet.expirationTime);
+            }
           }
         },
         error: (error: unknown) => this.walletError.set(this.resolveApiError(error, 'Unable to generate wallet right now.'))
@@ -239,6 +300,30 @@ export class StableCoinWalletModalComponent {
     ].join('\n');
 
     void this.copyToClipboard(details, 'Wallet details copied.');
+  }
+
+  private startExpiryCountdown(expirationTime: string): void {
+    if (this.expiryTimer) clearInterval(this.expiryTimer);
+
+    const expiry = new Date(expirationTime.replace(' ', 'T')).getTime();
+
+    const tick = (): void => {
+      const diff = expiry - Date.now();
+      if (diff <= 0) {
+        this.expiryCountdown.set('Expired');
+        if (this.expiryTimer) clearInterval(this.expiryTimer);
+        return;
+      }
+      const h = Math.floor(diff / 3_600_000);
+      const m = Math.floor((diff % 3_600_000) / 60_000);
+      const s = Math.floor((diff % 60_000) / 1_000);
+      this.expiryCountdown.set(
+        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+      );
+    };
+
+    tick();
+    this.expiryTimer = setInterval(tick, 1_000);
   }
 
   private async copyToClipboard(value: string, successMessage: string): Promise<void> {

@@ -395,33 +395,37 @@ export class MerchantLayoutComponent {
     }
   }
 
-  protected readonly menuItems: {
+  private readonly allMenuItems: {
     label: string;
     icon: string;
     link?: string;
     exact?: boolean;
-    children?: {
-      label: string;
-      link: string;
-      exact?: boolean;
-    }[];
+    hiddenForRoles?: string[];
+    children?: { label: string; link: string; exact?: boolean }[];
   }[] = [
-      { label: 'Overview', icon: 'home', link: '/dashboard', exact: true },
-      {
-        label: 'Payments',
-        icon: 'credit-card',
-        link: '/payment',
-        children: [{ label: 'Transactions', link: '/payment', exact: true }]
-      },
-      { label: 'Payout', icon: 'banknotes', link: '/payout' },
-      { label: 'Balance', icon: 'banknotes', link: '/balance' },
-      { label: 'Wallet', icon: 'wallet', link: '/wallet' },
-      { label: 'Merchants', icon: 'building-storefront', link: '/merchants' },
-      { label: 'Payment Link', icon: 'link', link: '/payment-link' },
-      { label: 'Teams', icon: 'users', link: '/teams' },
-      { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit' },
-      { label: 'Settings', icon: 'cog', link: '/settings' }
-    ];
+    { label: 'Overview', icon: 'home', link: '/dashboard', exact: true },
+    {
+      label: 'Payments',
+      icon: 'credit-card',
+      link: '/payment',
+      children: [{ label: 'Transactions', link: '/payment', exact: true }]
+    },
+    { label: 'Payout', icon: 'banknotes', link: '/payout' },
+    { label: 'Balance', icon: 'banknotes', link: '/balance' },
+    { label: 'Wallet', icon: 'wallet', link: '/wallet' },
+    { label: 'Merchants', icon: 'building-storefront', link: '/merchants', hiddenForRoles: ['ROLE_MERCHANT_ADMIN'] },
+    { label: 'Payment Link', icon: 'link', link: '/payment-link' },
+    { label: 'Teams', icon: 'users', link: '/teams' },
+    { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit' },
+    { label: 'Settings', icon: 'cog', link: '/settings' }
+  ];
+
+  protected get menuItems() {
+    const permissions = this.authService.getSession()?.permissions ?? [];
+    return this.allMenuItems.filter(
+      (item) => !item.hiddenForRoles?.some((r) => permissions.includes(r))
+    );
+  }
 
   protected readonly supportItems = [
     { label: 'Help Center', icon: 'question-mark-circle', action: 'help' },
@@ -460,11 +464,9 @@ export class MerchantLayoutComponent {
   }
 
   protected userRoleLabel(): string {
-    const session = this.authService.getSession();
-    const raw = session?.role?.trim();
-    if (!raw) {
-      return 'Admin';
-    }
+    const permissions = this.authService.getSession()?.permissions ?? [];
+    const raw = permissions[0]?.trim();
+    if (!raw) return 'Admin';
     return titleCase(raw.replace(/_/g, ' '));
   }
 

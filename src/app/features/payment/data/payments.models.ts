@@ -140,6 +140,8 @@ export interface PayoutResponse {
 
 export interface PaymentWalletRequest {
   ref: string;
+  firstName: string;
+  lastName: string;
   coin: string;
   customEmail: string;
   network: string;
@@ -155,6 +157,8 @@ export interface PaymentWallet {
   notice: string;
   mode: string;
   transactionType: string;
+  expirationTime: string;
+  transactionId: string;
 }
 
 export interface PaymentWalletResponse {

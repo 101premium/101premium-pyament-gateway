@@ -152,6 +152,26 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
         [formGroup]="walletForm"
         (ngSubmit)="submitWallet()"
       >
+        <label class="grid gap-1.5">
+          <span class="text-sm font-semibold text-[#42526b]">First Name</span>
+          <input
+            type="text"
+            class="min-h-11 rounded-xl border border-[rgba(138,158,191,0.24)] bg-[#f8fbff] px-3 text-sm text-[#24324d] outline-none"
+            formControlName="firstName"
+            placeholder="John"
+          />
+        </label>
+
+        <label class="grid gap-1.5">
+          <span class="text-sm font-semibold text-[#42526b]">Last Name</span>
+          <input
+            type="text"
+            class="min-h-11 rounded-xl border border-[rgba(138,158,191,0.24)] bg-[#f8fbff] px-3 text-sm text-[#24324d] outline-none"
+            formControlName="lastName"
+            placeholder="Doe"
+          />
+        </label>
+
         <label class="grid gap-1.5 md:col-span-2">
           <span class="text-sm font-semibold text-[#42526b]">Customer Email</span>
           <input
@@ -266,6 +286,8 @@ export class BalanceHomePageComponent {
   protected readonly searchParamControl = new FormControl('', { nonNullable: true });
   protected readonly merchantIdControl = new FormControl('', { nonNullable: true });
   protected readonly walletForm = this.fb.nonNullable.group({
+    firstName: ['', Validators.required],
+    lastName: ['', Validators.required],
     customEmail: ['', [Validators.required, Validators.email]],
     coin: ['', Validators.required],
     network: ['', Validators.required]

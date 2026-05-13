@@ -110,7 +110,8 @@ export class PaymentDetailPageComponent {
       { label: 'Rail', value: transaction.rail },
       { label: 'Card PAN', value: transaction.cardPan },
       { label: 'Redirect URL', value: transaction.redirectUrl },
-      { label: 'Checkout URL', value: transaction.checkoutUrl }
+      { label: 'Checkout URL', value: transaction.checkoutUrl },
+      { label: 'Crypto Mode', value: transaction.cryptoMode }
     ].filter(({ value }) => value && value !== 'Unavailable');
   }
 

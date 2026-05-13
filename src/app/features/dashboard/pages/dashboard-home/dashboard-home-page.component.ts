@@ -13,7 +13,7 @@ import { MerchantSearchService } from '../../../../shared/services/merchant-sear
 import { PaymentTransaction } from '../../../payment/data/payments.models';
 import { PaymentsService } from '../../../payment/data/payments.service';
 import { DashboardService } from '../../data/dashboard.service';
-import { DashboardStatsData } from '../../data/dashboard.models';
+import { DashboardChartBar, DashboardStatsData } from '../../data/dashboard.models';
 import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 
 @Component({
@@ -43,22 +43,35 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
               <div class="panel-heading">
                 <div>
                   <h3>Transaction Volume</h3>
-                  <p>Nov 1 — Nov 14, 2023</p>
+                  <p>{{ graphDateRange() }}</p>
                 </div>
 
                 <div class="switch-pill" aria-label="Transaction range">
-                  <button type="button">Weekly</button>
                   <button type="button" class="active">Monthly</button>
                 </div>
               </div>
 
-              <div class="chart-bars" aria-hidden="true">
-                <span
-                  *ngFor="let bar of chartBars; let i = index"
-                  [style.height.%]="bar"
-                  [class.active]="i === activeBarIndex"
-                ></span>
-              </div>
+              @if (graphLoading()) {
+                <div class="chart-bars chart-bars--loading" aria-hidden="true">
+                  <span *ngFor="let _ of [1,2,3,4,5,6]" style="height: 40%"></span>
+                </div>
+              } @else if (chartBars().length) {
+                <div class="chart-bars" aria-hidden="true">
+                  <span
+                    *ngFor="let bar of chartBars()"
+                    [style.height.%]="bar.height"
+                    [class.active]="bar.monthKey === currentMonthKey"
+                    [title]="bar.label + ': ' + bar.amount"
+                  ></span>
+                </div>
+                <div class="chart-labels">
+                  <span *ngFor="let bar of chartBars()" [class.active]="bar.monthKey === currentMonthKey">
+                    {{ bar.label }}
+                  </span>
+                </div>
+              } @else {
+                <p class="chart-empty">No graph data available.</p>
+              }
             </article>
           </div>
 
@@ -146,8 +159,13 @@ export class DashboardHomePageComponent {
     meta: 'Date'
   };
 
-  protected readonly chartBars = [36, 52, 42, 64, 56, 78, 88, 69, 61, 74, 64, 83, 56, 47];
-  protected readonly activeBarIndex = 11;
+  protected readonly chartBars = signal<DashboardChartBar[]>([]);
+  protected readonly graphLoading = signal(false);
+  protected readonly graphDateRange = signal('');
+  protected readonly currentMonthKey = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  })();
 
   protected readonly quickActions = [
     {
@@ -172,6 +190,24 @@ export class DashboardHomePageComponent {
       .subscribe((searchParam) => this.loadTransactions(searchParam, 0));
 
     this.loadDashboardStats();
+    this.loadGraph();
+  }
+
+  private loadGraph(): void {
+    this.graphLoading.set(true);
+
+    this.dashboardService
+      .getGraph('CRYPTO')
+      .pipe(finalize(() => this.graphLoading.set(false)), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (bars) => {
+          this.chartBars.set(bars);
+          if (bars.length) {
+            this.graphDateRange.set(`${bars[0].label} — ${bars[bars.length - 1].label}`);
+          }
+        },
+        error: () => this.chartBars.set([])
+      });
   }
 
   private loadDashboardStats(): void {
