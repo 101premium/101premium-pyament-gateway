@@ -36,8 +36,16 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
           </article>
 
           <ng-container *ngIf="!isLoading() && !errorMessage()">
-            <div *ngIf="transactions().length === 0" class="p-8 text-center">
-              <p class="m-0 text-sm text-[#61708a]">No wallet transactions found.</p>
+            <div *ngIf="transactions().length === 0" class="flex flex-col items-center justify-center gap-2 border-t border-[rgba(138,158,191,0.12)] px-6 py-9 text-center">
+              <div class="mb-1 grid h-[3.25rem] w-[3.25rem] place-items-center text-[#8b9cbb] opacity-85" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8" y="10" width="32" height="28" rx="3" stroke="currentColor" stroke-width="2" />
+                  <path d="M8 18h32" stroke="currentColor" stroke-width="2" />
+                  <circle cx="24" cy="30" r="4" stroke="currentColor" stroke-width="2" />
+                </svg>
+              </div>
+              <p class="m-0 text-[1.05rem] font-bold text-[#2f3743]">No wallet transactions found</p>
+              <p class="m-0 max-w-[22rem] text-[0.9rem] leading-[1.45] text-[#7a8aa3]">Refine your search or return later when new transactions have been processed.</p>
             </div>
 
             <table *ngIf="transactions().length > 0" class="w-full border-collapse text-sm">

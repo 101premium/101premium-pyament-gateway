@@ -8,10 +8,15 @@ import { ApiKeyData, ApiKeyResponse } from './api-key.models';
 export class ApiKeyService {
   private readonly http = inject(HttpClient);
   private readonly keysUrl = `${environment.apiBaseUrl}/merchant/keys`;
+  private readonly resetUrl = `${environment.apiBaseUrl}/merchant/reset`;
 
   getKeys(): Observable<ApiKeyData> {
     return this.http
       .get<ApiKeyResponse>(this.keysUrl)
       .pipe(map((res) => res.data ?? { apiKey: null, testApiKey: null }));
+  }
+
+  resetKeys(): Observable<unknown> {
+    return this.http.post(this.resetUrl, null);
   }
 }

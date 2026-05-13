@@ -461,7 +461,7 @@ export class MerchantLayoutComponent {
       { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit',
         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_AUDIT'] },
       { label: 'API Keys', icon: 'key', link: '/api-keys',
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
+        permission: ['ROLE_MERCHANT_ADMIN'] },
       { label: 'Settings', icon: 'cog', link: '/settings',
         permission: [] }
     ];

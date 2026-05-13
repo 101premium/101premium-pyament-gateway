@@ -69,62 +69,6 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
       <article class="merchant-panel merchant-panel--settings">
         <div class="panel-heading settings-panel-heading">
           <div>
-            <h3>Notifications</h3>
-            <p>Choose what we email you about. Preferences are saved on this device.</p>
-          </div>
-        </div>
-        <ul class="settings-toggle-list">
-          <li>
-            <div class="settings-toggle-list__copy">
-              <strong>Product updates</strong>
-              <span>News and tips about 101Premium.</span>
-            </div>
-            <button
-              type="button"
-              class="settings-switch"
-              role="switch"
-              [attr.aria-checked]="settings.emailNotifications()"
-              (click)="settings.setEmailNotifications(!settings.emailNotifications())"
-            >
-              <span class="settings-switch__thumb" [class.settings-switch__thumb--on]="settings.emailNotifications()"></span>
-            </button>
-          </li>
-          <li>
-            <div class="settings-toggle-list__copy">
-              <strong>Payment alerts</strong>
-              <span>When payments succeed, fail, or need attention.</span>
-            </div>
-            <button
-              type="button"
-              class="settings-switch"
-              role="switch"
-              [attr.aria-checked]="settings.paymentAlerts()"
-              (click)="settings.setPaymentAlerts(!settings.paymentAlerts())"
-            >
-              <span class="settings-switch__thumb" [class.settings-switch__thumb--on]="settings.paymentAlerts()"></span>
-            </button>
-          </li>
-          <li>
-            <div class="settings-toggle-list__copy">
-              <strong>Settlement alerts</strong>
-              <span>Payout and settlement summaries.</span>
-            </div>
-            <button
-              type="button"
-              class="settings-switch"
-              role="switch"
-              [attr.aria-checked]="settings.settlementAlerts()"
-              (click)="settings.setSettlementAlerts(!settings.settlementAlerts())"
-            >
-              <span class="settings-switch__thumb" [class.settings-switch__thumb--on]="settings.settlementAlerts()"></span>
-            </button>
-          </li>
-        </ul>
-      </article>
-
-      <article class="merchant-panel merchant-panel--settings">
-        <div class="panel-heading settings-panel-heading">
-          <div>
             <h3>Security</h3>
             <p>Session and password options.</p>
           </div>
@@ -281,16 +225,16 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
       padding: 0 1.35rem;
       border-radius: 999px;
       border: 0;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      background: #16a34a;
       color: #fff;
       font-size: 0.92rem;
       font-weight: 600;
       text-decoration: none;
-      box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 22%, transparent);
+      box-shadow: 0 10px 22px rgba(22, 163, 74, 0.22);
     }
 
     .settings-change-pwd-link:hover {
-      opacity: 0.95;
+      background: #15803d;
     }
 
     .settings-pwd-toast {

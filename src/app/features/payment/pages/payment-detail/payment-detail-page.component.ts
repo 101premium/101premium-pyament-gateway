@@ -123,9 +123,6 @@ export class PaymentDetailPageComponent {
       if (error.status === 404) {
         return 'Transaction not found.';
       }
-      if (error.status === 401) {
-        return 'Payment session expired. Please sign in again.';
-      }
     }
     if (error instanceof Error && error.message.trim()) {
       return error.message;

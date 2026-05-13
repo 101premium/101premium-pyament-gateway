@@ -19,6 +19,48 @@ import { ApiKeyService } from '../../data/api-key.service';
             API Keys
           </h1>
         </div>
+
+        <button
+          type="button"
+          class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#b42318] bg-white px-4 text-sm font-bold text-[#b42318] transition hover:bg-[#fff4f2] disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="resetting() || isLoading()"
+          (click)="confirmReset()"
+        >
+          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+          {{ resetting() ? 'Resetting...' : 'Reset API Keys' }}
+        </button>
+      </div>
+
+      <div *ngIf="resetError()" class="rounded-2xl border border-[#ffd7d3] bg-[#fff4f2] px-4 py-3 text-sm font-medium text-[#b42318]">
+        {{ resetError() }}
+      </div>
+
+      <div *ngIf="resetSuccess()" class="rounded-2xl border border-[#d9f0dd] bg-[#edf9ef] px-4 py-3 text-sm font-medium text-[#1c7f3d]">
+        {{ resetSuccess() }}
+      </div>
+
+      <div *ngIf="confirmingReset()" class="rounded-2xl border border-[#fde68a] bg-[#fef9ec] px-4 py-3">
+        <p class="m-0 mb-3 text-sm font-semibold text-[#92400e]">Are you sure? Resetting will invalidate your current API keys and generate new ones.</p>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="inline-flex min-h-9 items-center justify-center rounded-xl border border-[#b42318] bg-[#b42318] px-4 text-sm font-bold text-white transition hover:bg-[#991b1b] disabled:opacity-60"
+            [disabled]="resetting()"
+            (click)="executeReset()"
+          >
+            {{ resetting() ? 'Resetting...' : 'Yes, reset keys' }}
+          </button>
+          <button
+            type="button"
+            class="inline-flex min-h-9 items-center justify-center rounded-xl border border-[rgba(138,158,191,0.24)] bg-white px-4 text-sm font-bold text-[#52627c] transition hover:bg-[#f5f7fb]"
+            [disabled]="resetting()"
+            (click)="confirmingReset.set(false)"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
 
       <article *ngIf="isLoading()" class="p-6">

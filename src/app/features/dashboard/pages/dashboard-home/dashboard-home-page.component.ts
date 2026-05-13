@@ -120,7 +120,9 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
             [isLoading]="isLoading()"
             [errorMessage]="errorMessage()"
             [loadingMessage]="'Loading payment transactions...'"
-            [emptyTitle]="'No payment transactions found.'"
+            [emptyTitle]="'No transactions found'"
+            [emptyHint]="'Refine your search or return later when new transactions have been processed.'"
+            [detailedState]="true"
           />
         </section>
 
@@ -270,12 +272,9 @@ export class DashboardHomePageComponent {
 
   private resolveErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
+      if (error.status === 401) return '';
       if (typeof error.error?.description === 'string' && error.error.description.trim()) {
         return error.error.description;
-      }
-
-      if (error.status === 401) {
-        return 'Payment session expired. Please sign in again.';
       }
     }
 
