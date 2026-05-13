@@ -400,30 +400,51 @@ export class MerchantLayoutComponent {
     icon: string;
     link?: string;
     exact?: boolean;
-    hiddenForRoles?: string[];
+    permission?: string[];
     children?: { label: string; link: string; exact?: boolean }[];
   }[] = [
-    { label: 'Overview', icon: 'home', link: '/dashboard', exact: true },
-    {
-      label: 'Payments',
-      icon: 'credit-card',
-      link: '/payment',
-      children: [{ label: 'Transactions', link: '/payment', exact: true }]
-    },
-    { label: 'Payout', icon: 'banknotes', link: '/payout' },
-    { label: 'Balance', icon: 'banknotes', link: '/balance' },
-    { label: 'Wallet', icon: 'wallet', link: '/wallet' },
-    { label: 'Merchants', icon: 'building-storefront', link: '/merchants', hiddenForRoles: ['ROLE_MERCHANT_ADMIN'] },
-    { label: 'Payment Link', icon: 'link', link: '/payment-link' },
-    { label: 'Teams', icon: 'users', link: '/teams' },
-    { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit' },
-    { label: 'Settings', icon: 'cog', link: '/settings' }
-  ];
+      { label: 'Overview', icon: 'home', link: '/dashboard', exact: true, 
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
+      {
+        label: 'Payments',
+        icon: 'credit-card',
+        link: '/payment',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_PAYMENT'],
+        children: [{ label: 'Transactions', link: '/payment', exact: true }]
+      },
+      { label: 'Payout', icon: 'banknotes', link: '/payout', 
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
+      { label: 'Balance', icon: 'banknotes', link: '/balance', 
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
+      { label: 'Wallet', icon: 'wallet', link: '/wallet', 
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
+      { label: 'Merchants', icon: 'building-storefront', link: '/merchants', 
+        permission: ['ROLE_ADMIN'] },
+      {
+        label: 'Payment Link', icon: 'link', link: '/payment-link',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_CREATE_MERCHANT',
+          'ROLE_VIEW_MERCHANT'
+        ]
+      },
+      {
+        label: 'Teams', icon: 'users', link: '/teams',
+         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_VIEW_MERCHANT_USERS',
+          'ROLE_CREATE_MERCHANT_USERS', 'ROLE_CREATE_MERCHANT_ROLE',
+          'ROLE_UPDATE_MERCHANT_ROLE', 'ROLE_VIEW_MERCHANT_ROLE',
+          'ROLE_VIEW_ROLE', 'ROLE_UPDATE_ROLE', 'ROLE_CREATE_ROLE',
+          'ROLE_VIEW_USERS','ROLE_CREATE_USERS'
+        ]
+      },
+      { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit', 
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_AUDIT'] },
+      { label: 'Settings', icon: 'cog', link: '/settings', 
+        permission: [] }
+    ];
 
   protected get menuItems() {
     const permissions = this.authService.getSession()?.permissions ?? [];
     return this.allMenuItems.filter(
-      (item) => !item.hiddenForRoles?.some((r) => permissions.includes(r))
+      (item) => !item.permission || item.permission.length === 0 || item.permission.some((r) => permissions.includes(r))
     );
   }
 
