@@ -160,9 +160,42 @@ export class ApiKeyHomePageComponent {
   protected readonly copied = signal('');
   protected readonly revealLive = signal(false);
   protected readonly revealTest = signal(false);
+  protected readonly confirmingReset = signal(false);
+  protected readonly resetting = signal(false);
+  protected readonly resetError = signal('');
+  protected readonly resetSuccess = signal('');
 
   constructor() {
     this.loadKeys();
+  }
+
+  protected confirmReset(): void {
+    this.resetError.set('');
+    this.resetSuccess.set('');
+    this.confirmingReset.set(true);
+  }
+
+  protected executeReset(): void {
+    this.resetting.set(true);
+    this.resetError.set('');
+    this.resetSuccess.set('');
+
+    this.apiKeyService
+      .resetKeys()
+      .pipe(finalize(() => this.resetting.set(false)))
+      .subscribe({
+        next: () => {
+          this.confirmingReset.set(false);
+          this.revealLive.set(false);
+          this.revealTest.set(false);
+          this.resetSuccess.set('API keys have been reset successfully.');
+          this.loadKeys();
+        },
+        error: (error: unknown) => {
+          this.confirmingReset.set(false);
+          this.resetError.set(this.resolveError(error, 'Unable to reset API keys right now.'));
+        }
+      });
   }
 
   private loadKeys(): void {
@@ -174,7 +207,7 @@ export class ApiKeyHomePageComponent {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (data) => this.keys.set(data),
-        error: (error: unknown) => this.errorMessage.set(this.resolveError(error))
+        error: (error: unknown) => this.errorMessage.set(this.resolveError(error, 'Unable to load API keys right now.'))
       });
   }
 
@@ -193,7 +226,7 @@ export class ApiKeyHomePageComponent {
     });
   }
 
-  private resolveError(error: unknown): string {
+  private resolveError(error: unknown, fallback: string): string {
     if (error instanceof HttpErrorResponse) {
       if (typeof error.error?.description === 'string' && error.error.description.trim()) {
         return error.error.description;
@@ -201,6 +234,6 @@ export class ApiKeyHomePageComponent {
       if (error.status === 401) return 'Session expired. Please sign in again.';
     }
     if (error instanceof Error && error.message.trim()) return error.message;
-    return 'Unable to load API keys right now.';
+    return fallback;
   }
 }
