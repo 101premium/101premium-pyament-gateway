@@ -433,11 +433,16 @@ export class MerchantLayoutComponent {
         icon: 'credit-card',
         link: '/payment',
         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_PAYMENT'],
-        children: [{ label: 'Transactions', link: '/payment', exact: true }]
+        children: [
+          { label: 'StableCoin Transaction', link: '/payment', exact: true },
+          { label: 'Card Transaction', link: '/payment/card-transactions', exact: true }
+        ]
       },
       { label: 'Payout', icon: 'banknotes', link: '/payout', 
         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
       { label: 'Balance', icon: 'banknotes', link: '/balance', 
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
+      { label: 'Settlement', icon: 'clipboard-document-list', link: '/settlement',
         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
       { label: 'Wallet', icon: 'wallet', link: '/wallet', 
         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },

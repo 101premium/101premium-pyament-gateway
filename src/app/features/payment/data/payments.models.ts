@@ -23,16 +23,23 @@ export interface TransactionPageRecord {
   currency: string;
   email: string;
   countryCode: string;
+  cardType?: string | null;
   redirectUrl: string | null;
   transactionStatus: string;
   transactionMessage: string;
+  transactionType: string | null;
   errorMessage: string | null;
   errorReason: string | null;
   rail: string | null;
   checkoutUrl: string | null;
   createdDate: string;
+  ipAddress?: string | null;
   cryptoMode: string | null;
   address: string | null;
+  settlementStatus?: string | null;
+  settlementDate?: string | null;
+  payOutAmount?: string | number | null;
+  fees?: string | number | null;
 }
 
 /** Inner `data` object: list + pagination. */
@@ -59,6 +66,7 @@ export interface PaymentTransaction {
   status: string;
   statusClass: string;
   amount: string;
+  transactionType: string;
   date: string;
 }
 
@@ -75,6 +83,7 @@ export interface PaymentTransactionDetailView {
   status: string;
   statusClass: string;
   amount: string;
+  transactionType: string;
   customerName: string;
   email: string;
   createdDate: string;
@@ -85,11 +94,16 @@ export interface PaymentTransactionDetailView {
   countryCode: string;
   rail: string;
   cardPan: string;
+  cardType: string;
   redirectUrl: string;
   checkoutUrl: string;
   errorText: string;
   cryptoMode: string;
   address: string;
+  settlementStatus: string;
+  settlementDate: string;
+  payoutAmount: string;
+  fees: string;
 }
 
 /** Result returned by `PaymentsService.getTransactions`. */

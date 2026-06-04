@@ -6,7 +6,7 @@ import { finalize } from 'rxjs';
 import { PaymentsService } from '../../data/payments.service';
 
 @Component({
-  selector: 'app-payment-detail-page',
+  selector: 'app-card-transaction-detail-page',
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
@@ -15,16 +15,16 @@ import { PaymentsService } from '../../data/payments.service';
         <div class="grid gap-1">
           <p class="m-0 text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-[#5b6c86]">Payments</p>
           <h1 class="m-0 text-[clamp(1.45rem,2.2vw,1.85rem)] font-bold leading-[1.2] tracking-[-0.025em] text-[#2a3340]">
-            Transaction details
+            Card transaction details
           </h1>
         </div>
-        <a routerLink="/payment" class="rounded-full border border-[color-mix(in_srgb,var(--primary)_24%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--primary)]">
-          Back to payments
+        <a routerLink="/payment/card-transactions" class="rounded-full border border-[color-mix(in_srgb,var(--primary)_24%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--primary)]">
+          Back to cards
         </a>
       </div>
 
       <article *ngIf="isLoading()" class="merchant-panel rounded-[1.8rem] p-6">
-        <p class="m-0 text-sm text-[#61708a]">Loading transaction details...</p>
+        <p class="m-0 text-sm text-[#61708a]">Loading card transaction details...</p>
       </article>
 
       <article *ngIf="!isLoading() && errorMessage()" class="merchant-panel rounded-[1.8rem] border border-[#ffd7d3] bg-[#fff6f5] p-6">
@@ -43,7 +43,10 @@ import { PaymentsService } from '../../data/payments.service';
           </div>
 
           <dl class="mt-5 grid gap-0">
-            <div class="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] gap-4 border-t border-[rgba(138,158,191,0.14)] py-3 first:border-t-0 first:pt-0" *ngFor="let item of detailRows()">
+            <div
+              class="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] gap-4 border-t border-[rgba(138,158,191,0.14)] py-3 first:border-t-0 first:pt-0"
+              *ngFor="let item of detailRows()"
+            >
               <dt class="text-xs font-bold uppercase tracking-[0.06em] text-[#7a8aa3]">{{ item.label }}</dt>
               <dd class="m-0 break-words text-sm text-[#2a3340]">{{ item.value }}</dd>
             </div>
@@ -63,6 +66,14 @@ import { PaymentsService } from '../../data/payments.service';
               <strong class="mt-1 block text-base text-[#2f3743]">{{ transaction()!.amount }}</strong>
             </div>
             <div>
+              <span class="block text-xs font-semibold uppercase tracking-[0.14em] text-[#91a0bb]">Fees</span>
+              <span class="mt-1 block text-sm text-[#607089]">{{ transaction()!.fees }}</span>
+            </div>
+            <div>
+              <span class="block text-xs font-semibold uppercase tracking-[0.14em] text-[#91a0bb]">Payout Amount</span>
+              <span class="mt-1 block text-sm text-[#607089]">{{ transaction()!.payoutAmount }}</span>
+            </div>
+            <div>
               <span class="block text-xs font-semibold uppercase tracking-[0.14em] text-[#91a0bb]">Created</span>
               <span class="mt-1 block text-sm text-[#607089]">{{ transaction()!.createdDate }}</span>
             </div>
@@ -72,7 +83,7 @@ import { PaymentsService } from '../../data/payments.service';
     </main>
   `
 })
-export class PaymentDetailPageComponent {
+export class CardTransactionDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly paymentsService = inject(PaymentsService);
 
@@ -84,7 +95,7 @@ export class PaymentDetailPageComponent {
     const transactionId = this.route.snapshot.paramMap.get('transactionId') ?? '';
 
     this.paymentsService
-      .getTransactionDetail(transactionId)
+      .getCardTransactionDetail(transactionId)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (transaction) => this.transaction.set(transaction),
@@ -97,9 +108,7 @@ export class PaymentDetailPageComponent {
 
   protected detailRows(): { label: string; value: string }[] {
     const transaction = this.transaction();
-    if (!transaction) {
-      return [];
-    }
+    if (!transaction) return [];
 
     return [
       { label: 'Type', value: transaction.transactionType },
@@ -108,12 +117,12 @@ export class PaymentDetailPageComponent {
       { label: 'Transaction ID', value: transaction.transactionId },
       { label: 'Payment Ref', value: transaction.paymentReference },
       { label: 'Country', value: transaction.countryCode },
-      { label: 'Rail', value: transaction.rail },
       { label: 'Card PAN', value: transaction.cardPan },
-      { label: 'Redirect URL', value: transaction.redirectUrl },
-      { label: 'Checkout URL', value: transaction.checkoutUrl },
-      { label: 'Crypto Mode', value: transaction.cryptoMode }
-    ].filter(({ value }) => value && value !== 'Unavailable');
+      { label: 'Card Type', value: transaction.cardType },
+      { label: 'Address', value: transaction.address },
+      { label: 'Settlement Status', value: transaction.settlementStatus },
+      { label: 'Settlement Date', value: transaction.settlementDate }
+    ].filter(({ value }) => value && value !== 'Unavailable' && value !== 'Date unavailable');
   }
 
   private resolveErrorMessage(error: unknown): string {
@@ -121,13 +130,10 @@ export class PaymentDetailPageComponent {
       if (typeof error.error?.description === 'string' && error.error.description.trim()) {
         return error.error.description;
       }
-      if (error.status === 404) {
-        return 'Transaction not found.';
-      }
+      if (error.status === 404) return 'Card transaction not found.';
+      if (error.status === 401) return 'Card transaction session expired. Please sign in again.';
     }
-    if (error instanceof Error && error.message.trim()) {
-      return error.message;
-    }
-    return 'Unable to load this transaction right now.';
+    if (error instanceof Error && error.message.trim()) return error.message;
+    return 'Unable to load this card transaction right now.';
   }
 }

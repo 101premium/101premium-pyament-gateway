@@ -156,5 +156,6 @@ export interface MerchantTransactionFeedRecord {
   email?: string | null;
   transactionStatus?: string | null;
   transactionMessage?: string | null;
+  transactionType?: string | null;
   createdDate?: string | null;
 }

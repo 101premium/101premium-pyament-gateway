@@ -911,6 +911,14 @@ input {
   color: #7f8ea7;
 }
 
+.chart-controls {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
 .switch-pill {
   display: inline-flex;
   padding: 0.25rem;
@@ -932,6 +940,25 @@ input {
   color: white;
   background: var(--primary);
   box-shadow: 0 10px 20px color-mix(in srgb, var(--primary) 24%, transparent);
+}
+
+.chart-type-select select {
+  min-height: 2.9rem;
+  min-width: 9.4rem;
+  border: 1px solid rgba(138, 158, 191, 0.32);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: #3d4d63;
+  padding: 0 2.25rem 0 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  outline: 0;
+  cursor: pointer;
+}
+
+.chart-type-select select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .chart-bars {

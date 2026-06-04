@@ -5,6 +5,8 @@ import { BalanceHomePageComponent } from '../../features/balance/pages/balance-h
 import { DashboardHomePageComponent } from '../../features/dashboard/pages/dashboard-home/dashboard-home-page.component';
 import { PaymentDetailPageComponent } from '../../features/payment/pages/payment-detail/payment-detail-page.component';
 import { PaymentHomePageComponent } from '../../features/payment/pages/payment-home/payment-home-page.component';
+import { CardTransactionPageComponent } from '../../features/payment/pages/card-transaction/card-transaction-page.component';
+import { CardTransactionDetailPageComponent } from '../../features/payment/pages/card-transaction-detail/card-transaction-detail-page.component';
 import { PaymentLinkHomePageComponent } from '../../features/payment-link/pages/payment-link-home/payment-link-home-page.component';
 import { PayoutHomePageComponent } from '../../features/payout/pages/payout-home/payout-home-page.component';
 import { PayoutDetailPageComponent } from '../../features/payout/pages/payout-detail/payout-detail-page.component';
@@ -18,6 +20,8 @@ import { UserDetailPageComponent } from '../../features/users/pages/user-detail/
 import { UserHomePageComponent } from '../../features/users/pages/user-home/user-home-page.component';
 import { SettingsHomePageComponent } from '../../features/settings/pages/settings-home/settings-home-page.component';
 import { ChangePasswordPageComponent } from '../../features/settings/pages/change-password/change-password-page.component';
+import { SettlementHomePageComponent } from '../../features/settlement/pages/settlement-home/settlement-home-page.component';
+import { SettlementDetailPageComponent } from '../../features/settlement/pages/settlement-detail/settlement-detail-page.component';
 import { MerchantHomePageComponent } from '../../features/merchant/pages/merchant-home/merchant-home-page.component';
 import { MerchantDetailPageComponent } from '../../features/merchant/pages/merchant-detail/merchant-detail-page.component';
 import { AddMerchantPageComponent } from '../../features/merchant/pages/add-merchant/add-merchant-page.component';
@@ -28,11 +32,15 @@ export const merchantLayoutRoutes: Routes = [
   { path: 'dashboard', component: DashboardHomePageComponent },
   { path: 'balance', component: BalanceHomePageComponent },
   { path: 'wallet', component: WalletHomePageComponent },
+  { path: 'settlement/details', component: SettlementDetailPageComponent },
+  { path: 'settlement', component: SettlementHomePageComponent },
   { path: 'transactions', component: PaymentHomePageComponent },
   { path: 'payment-link', component: PaymentLinkHomePageComponent },
   { path: 'payout', component: PayoutHomePageComponent },
   { path: 'payout/:transactionId', component: PayoutDetailPageComponent },
   { path: 'payment', component: PaymentHomePageComponent },
+  { path: 'payment/card-transactions', component: CardTransactionPageComponent },
+  { path: 'payment/card-transactions/:transactionId', component: CardTransactionDetailPageComponent },
   { path: 'payment/:transactionId', component: PaymentDetailPageComponent },
   { path: 'audit', component: AuditHomePageComponent },
   { path: 'audit/:auditId', component: AuditDetailPageComponent },

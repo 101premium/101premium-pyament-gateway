@@ -35,7 +35,9 @@ import {
 export class PaymentsService {
   private readonly http = inject(HttpClient);
   private readonly transactionPageUrl = `${environment.apiBaseUrl}/transaction/page`;
+  private readonly cardTransactionPageUrl = `${environment.apiBaseUrl}/card/transaction/page`;
   private readonly transactionDetailUrl = `${environment.apiBaseUrl}/transaction`;
+  private readonly cardTransactionDetailUrl = `${environment.apiBaseUrl}/card/transaction`;
   private readonly paymentAssetsUrl = `${environment.apiBaseUrl}/payment/assets`;
   private readonly paymentAssetNetworksUrl = `${environment.apiBaseUrl}/payment/assets/network`;
   private readonly walletPayoutUrl = `${environment.apiBaseUrl}/payment/wallet/payout`;
@@ -72,9 +74,30 @@ export class PaymentsService {
       .pipe(map((res) => mapTransactionPageResponse(res, routePrefix)));
   }
 
+  getCardTransactions(query: PaymentQueryParams): Observable<PaymentTransactionPageResult> {
+    let params = new HttpParams()
+      .set('page', String(query.page))
+      .set('size', String(query.size));
+
+    const search = query.searchParam?.trim();
+    if (search) {
+      params = params.set('searchParam', search);
+    }
+
+    return this.http
+      .get<TransactionPageResponse>(this.cardTransactionPageUrl, { params })
+      .pipe(map(mapCardTransactionPageResponse));
+  }
+
   getTransactionDetail(transactionId: string): Observable<PaymentTransactionDetailView> {
     return this.http
       .get<TransactionDetailResponse>(`${this.transactionDetailUrl}/${encodeURIComponent(transactionId)}`)
+      .pipe(map((response) => this.mapTransactionDetailForView(response)));
+  }
+
+  getCardTransactionDetail(transactionId: string): Observable<PaymentTransactionDetailView> {
+    return this.http
+      .get<TransactionDetailResponse>(`${this.cardTransactionDetailUrl}/${encodeURIComponent(transactionId)}`)
       .pipe(map((response) => this.mapTransactionDetailForView(response)));
   }
 
@@ -126,6 +149,7 @@ export class PaymentsService {
       status,
       statusClass: statusClassForLabel(status),
       amount: formatTransactionAmount(row.amount, row.currency?.trim() || 'USD'),
+      transactionType: row.transactionType?.trim() || 'Unavailable',
       customerName,
       email: row.email?.trim() || 'No email provided',
       createdDate: formatDisplayDate(row.createdDate),
@@ -136,11 +160,16 @@ export class PaymentsService {
       countryCode: row.countryCode?.trim() || 'Unavailable',
       rail: row.rail?.trim() || 'Unavailable',
       cardPan: row.cardPan?.trim() || 'Unavailable',
+      cardType: row.cardType?.trim() || 'Unavailable',
       redirectUrl: row.redirectUrl?.trim() || 'Unavailable',
       checkoutUrl: row.checkoutUrl?.trim() || 'Unavailable',
       errorText: row.errorMessage?.trim() || row.errorReason?.trim() || 'No error recorded',
       cryptoMode: row.cryptoMode?.trim() || 'Unavailable',
-      address: row.address?.trim() || 'Unavailable'
+      address: row.address?.trim() || 'Unavailable',
+      settlementStatus: row.settlementStatus?.trim() || 'Unavailable',
+      settlementDate: formatDisplayDate(row.settlementDate ?? ''),
+      payoutAmount: formatOptionalTransactionAmount(row.payOutAmount, row.currency?.trim() || 'USD'),
+      fees: formatOptionalTransactionAmount(row.fees, row.currency?.trim() || 'USD')
     };
   }
 }
@@ -151,6 +180,18 @@ function mapTransactionPageResponse(res: TransactionPageResponse, routePrefix: s
 
   return {
     items: rows.map((row) => toPaymentTransaction(row, routePrefix)),
+    currentPage: page?.currentPage ?? 0,
+    totalPages: page?.totalPages ?? 0,
+    totalItems: page?.totalItems ?? 0
+  };
+}
+
+function mapCardTransactionPageResponse(res: TransactionPageResponse): PaymentTransactionPageResult {
+  const page = res.data;
+  const rows = page?.data ?? [];
+
+  return {
+    items: rows.map(toCardTransaction),
     currentPage: page?.currentPage ?? 0,
     totalPages: page?.totalPages ?? 0,
     totalItems: page?.totalItems ?? 0
@@ -179,6 +220,36 @@ function toPaymentTransaction(row: TransactionPageRecord, routePrefix: string): 
     status,
     statusClass: statusClassForLabel(status),
     amount: formatTransactionAmount(row.amount, currency),
+    transactionType: row.transactionType?.trim() || '--',
+    date: formatDisplayDate(row.createdDate)
+  };
+}
+
+function toCardTransaction(row: TransactionPageRecord): PaymentTransaction {
+  const name =
+    [row.firstName, row.lastName]
+      .map((s) => (typeof s === 'string' ? s.trim() : ''))
+      .filter(Boolean)
+      .join(' ')
+      .trim() ||
+    row.merchantName?.trim() ||
+    row.ref?.trim() ||
+    'Unknown customer';
+
+  const status = labelForTransactionStatus(row);
+  const currency = row.currency?.trim() || 'USD';
+  const cardPan = row.cardPan?.trim();
+  const email = row.email?.trim();
+
+  return {
+    route: buildTransactionRoute(row, '/payment/card-transactions'),
+    initials: initialsFromName(name),
+    name,
+    email: cardPan || email || 'No card details provided',
+    status,
+    statusClass: statusClassForLabel(status),
+    amount: formatTransactionAmount(row.amount, currency),
+    transactionType: row.cardType?.trim() || row.transactionType?.trim() || '--',
     date: formatDisplayDate(row.createdDate)
   };
 }
@@ -212,15 +283,22 @@ function extractTransactionDetailRecord(response: TransactionDetailResponse): Tr
     email: record?.email ?? '',
     countryCode: record?.countryCode ?? '',
     redirectUrl: record?.redirectUrl ?? null,
+    cardType: record?.cardType ?? null,
     transactionStatus: record?.transactionStatus ?? '',
     transactionMessage: record?.transactionMessage ?? '',
+    transactionType: record?.transactionType ?? null,
     errorMessage: record?.errorMessage ?? null,
     errorReason: record?.errorReason ?? null,
     rail: record?.rail ?? null,
     checkoutUrl: record?.checkoutUrl ?? null,
     createdDate: record?.createdDate ?? '',
+    ipAddress: record?.ipAddress ?? null,
     cryptoMode: record?.cryptoMode ?? null,
-    address: record?.address ?? null
+    address: record?.address ?? null,
+    settlementStatus: record?.settlementStatus ?? null,
+    settlementDate: record?.settlementDate ?? null,
+    payOutAmount: record?.payOutAmount ?? null,
+    fees: record?.fees ?? null
   };
 }
 
@@ -230,6 +308,14 @@ function formatTransactionAmount(amount: string | number, currencyCode: string):
   }
 
   return formatMoney(amount, currencyCode);
+}
+
+function formatOptionalTransactionAmount(amount: string | number | null | undefined, currencyCode: string): string {
+  if (amount === null || amount === undefined || amount === '') {
+    return 'Unavailable';
+  }
+
+  return formatTransactionAmount(amount, currencyCode);
 }
 
 function labelForTransactionStatus(row: TransactionPageRecord): string {

@@ -294,6 +294,7 @@ function mapTransactionFeedRow(row: Record<string, unknown>): SummaryTableRow {
     statusText,
     statusTone,
     amountText,
+    transactionType: stringValue(row['transactionType']) || undefined,
     metaText: formatDisplayDate(created)
   };
 }

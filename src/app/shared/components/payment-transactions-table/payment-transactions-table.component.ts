@@ -5,6 +5,7 @@ import { TransactionTableSkeletonComponent } from './transaction-table-skeleton.
 
 export interface SummaryTableRow {
   route?: string;
+  queryParams?: Record<string, string>;
   initials?: string;
   avatarText?: string;
   name?: string;
@@ -17,6 +18,8 @@ export interface SummaryTableRow {
   statusTone?: string;
   amount?: string;
   amountText?: string;
+  transactionType?: string;
+  transactionTypeText?: string;
   date?: string;
   metaText?: string;
 }
@@ -100,6 +103,7 @@ export interface SummaryTableHeaders {
             <a
               class="transaction-row"
               [routerLink]="row.route"
+              [queryParams]="row.queryParams"
               [style.grid-template-columns]="gridTemplateColumns()"
             >
               <div class="customer-cell">
@@ -118,6 +122,10 @@ export interface SummaryTableHeaders {
 
               @if (showsColumn('amount')) {
                 <strong class="amount-cell">{{ amountText(row) }}</strong>
+              }
+
+              @if (showsColumn('transactionType')) {
+                <span class="transaction-type-cell">{{ transactionTypeText(row) }}</span>
               }
 
               @if (showsColumn('meta')) {
@@ -145,6 +153,10 @@ export interface SummaryTableHeaders {
 
               @if (showsColumn('amount')) {
                 <strong class="amount-cell">{{ amountText(row) }}</strong>
+              }
+
+              @if (showsColumn('transactionType')) {
+                <span class="transaction-type-cell">{{ transactionTypeText(row) }}</span>
               }
 
               @if (showsColumn('meta')) {
@@ -178,6 +190,7 @@ export class SummaryTableComponent {
       { key: 'primary', label: headers.primary },
       ...(headers.status ? [{ key: 'status', label: headers.status }] : []),
       ...(headers.amount ? [{ key: 'amount', label: headers.amount }] : []),
+      ...(headers.transactionType ? [{ key: 'transactionType', label: headers.transactionType }] : []),
       ...(headers.meta ? [{ key: 'meta', label: headers.meta }] : [])
     ];
   });
@@ -211,6 +224,10 @@ export class SummaryTableComponent {
     return row.amountText || row.amount || '--';
   }
 
+  protected transactionTypeText(row: SummaryTableRow): string {
+    return row.transactionTypeText || row.transactionType || '--';
+  }
+
   protected metaText(row: SummaryTableRow): string {
     return row.metaText || row.date || '--';
   }
@@ -227,6 +244,8 @@ export class SummaryTableComponent {
         return '0.85fr';
       case 'amount':
         return '0.8fr';
+      case 'transactionType':
+        return '0.9fr';
       case 'meta':
         return '0.45fr';
       default:

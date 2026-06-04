@@ -46,8 +46,20 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
                   <p>{{ graphDateRange() }}</p>
                 </div>
 
-                <div class="switch-pill" aria-label="Transaction range">
-                  <button type="button" class="active">Monthly</button>
+                <div class="chart-controls">
+                  <div class="switch-pill" aria-label="Transaction range">
+                    <button type="button" class="active">Monthly</button>
+                  </div>
+
+                  <label class="chart-type-select" aria-label="Transaction type">
+                    <select
+                      [value]="selectedGraphTransactionType()"
+                      (change)="changeGraphTransactionType($event)"
+                    >
+                      <option value="card">Card</option>
+                      <option value="crypto">Stable Coin</option>
+                    </select>
+                  </label>
                 </div>
               </div>
 
@@ -164,6 +176,7 @@ export class DashboardHomePageComponent {
   protected readonly chartBars = signal<DashboardChartBar[]>([]);
   protected readonly graphLoading = signal(false);
   protected readonly graphDateRange = signal('');
+  protected readonly selectedGraphTransactionType = signal<'card' | 'crypto'>('card');
   protected readonly currentMonthKey = (() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -199,7 +212,7 @@ export class DashboardHomePageComponent {
     this.graphLoading.set(true);
 
     this.dashboardService
-      .getGraph('CRYPTO')
+      .getGraph(this.selectedGraphTransactionType())
       .pipe(finalize(() => this.graphLoading.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (bars) => {
@@ -210,6 +223,12 @@ export class DashboardHomePageComponent {
         },
         error: () => this.chartBars.set([])
       });
+  }
+
+  protected changeGraphTransactionType(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedGraphTransactionType.set(value === 'crypto' ? 'crypto' : 'card');
+    this.loadGraph();
   }
 
   private loadDashboardStats(): void {
