@@ -137,6 +137,7 @@ export class SettlementDetailPageComponent {
     status: 'Status',
     amount: 'Amount',
     transactionType: 'Card Type',
+    detail: 'Settlement Status',
     meta: 'Date'
   };
 

@@ -20,6 +20,9 @@ export interface SummaryTableRow {
   amountText?: string;
   transactionType?: string;
   transactionTypeText?: string;
+  detail?: string;
+  detailText?: string;
+  detailTone?: string;
   date?: string;
   metaText?: string;
 }
@@ -30,6 +33,7 @@ export interface SummaryTableHeaders {
   amount?: string;
   meta?: string;
   transactionType?: string;
+  detail?: string;
 }
 
 @Component({
@@ -128,6 +132,10 @@ export interface SummaryTableHeaders {
                 <span class="transaction-type-cell">{{ transactionTypeText(row) }}</span>
               }
 
+              @if (showsColumn('detail')) {
+                <span class="status-pill" [class]="detailClass(row)">{{ detailText(row) }}</span>
+              }
+
               @if (showsColumn('meta')) {
                 <span class="date-cell">{{ metaText(row) }}</span>
               }
@@ -157,6 +165,10 @@ export interface SummaryTableHeaders {
 
               @if (showsColumn('transactionType')) {
                 <span class="transaction-type-cell">{{ transactionTypeText(row) }}</span>
+              }
+
+              @if (showsColumn('detail')) {
+                <span class="status-pill" [class]="detailClass(row)">{{ detailText(row) }}</span>
               }
 
               @if (showsColumn('meta')) {
@@ -191,6 +203,7 @@ export class SummaryTableComponent {
       ...(headers.status ? [{ key: 'status', label: headers.status }] : []),
       ...(headers.amount ? [{ key: 'amount', label: headers.amount }] : []),
       ...(headers.transactionType ? [{ key: 'transactionType', label: headers.transactionType }] : []),
+      ...(headers.detail ? [{ key: 'detail', label: headers.detail }] : []),
       ...(headers.meta ? [{ key: 'meta', label: headers.meta }] : [])
     ];
   });
@@ -228,6 +241,14 @@ export class SummaryTableComponent {
     return row.transactionTypeText || row.transactionType || '--';
   }
 
+  protected detailText(row: SummaryTableRow): string {
+    return row.detailText || row.detail || '--';
+  }
+
+  protected detailClass(row: SummaryTableRow): string {
+    return row.detailTone || 'pending';
+  }
+
   protected metaText(row: SummaryTableRow): string {
     return row.metaText || row.date || '--';
   }
@@ -245,6 +266,8 @@ export class SummaryTableComponent {
       case 'amount':
         return '0.8fr';
       case 'transactionType':
+        return '0.9fr';
+      case 'detail':
         return '0.9fr';
       case 'meta':
         return '0.45fr';

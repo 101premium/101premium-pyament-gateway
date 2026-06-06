@@ -6,6 +6,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server
   },
   {
+    path: 'payment/card-transactions/:transactionId',
+    renderMode: RenderMode.Server
+  },
+  {
     path: 'payment/:transactionId',
     renderMode: RenderMode.Server
   },

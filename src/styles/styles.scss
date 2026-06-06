@@ -606,7 +606,9 @@ input {
     position: static;
     align-self: stretch;
     min-height: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     grid-template-rows: auto auto auto 1fr;
   }
 

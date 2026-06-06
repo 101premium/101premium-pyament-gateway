@@ -67,20 +67,26 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
             @for (item of menuItems; track item.label) {
               @if (item.children?.length) {
                 <div class="grid gap-1">
-                  <a
-                    class="flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#16a34a]"
-                    [routerLink]="item.link"
-                    routerLinkActive="bg-[#eef0ff] text-[#16a34a]"
-                    [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                    (click)="closeSidebarOnMobile()"
+                  <button
+                    type="button"
+                    class="flex w-full cursor-pointer items-center gap-3 rounded-2xl border-0 bg-transparent px-4 py-4 text-left no-underline transition duration-200 ease-out text-[#6b7c99] hover:bg-[#f3f4ff] hover:text-[#16a34a]"
+                    [ngClass]="isParentActive(item) ? 'bg-[#eef0ff] text-[#16a34a]' : ''"
+                    [attr.aria-expanded]="isMenuExpanded(item.label)"
+                    (click)="toggleMenu(item.label)"
                   >
                     <span class="grid h-5 w-5 shrink-0 place-items-center text-inherit" aria-hidden="true">
                       <ng-container [ngTemplateOutlet]="navIcon" [ngTemplateOutletContext]="{ icon: item.icon }" />
                     </span>
                     <span class="text-[1.05rem] font-medium leading-none">{{ item.label }}</span>
-                  </a>
+                    <span class="ml-auto grid h-5 w-5 place-items-center transition-transform duration-200" [class.rotate-180]="isMenuExpanded(item.label)" aria-hidden="true">
+                      <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
+                      </svg>
+                    </span>
+                  </button>
 
-                  <div class="ml-8 grid gap-1 border-l border-[rgba(138,158,191,0.16)] pl-3">
+                  @if (isMenuExpanded(item.label)) {
+                    <div class="ml-8 grid gap-1 border-l border-[rgba(138,158,191,0.16)] pl-3">
                     @for (child of item.children; track child.label) {
                       <a
                         class="flex min-h-10 w-full items-center rounded-xl px-3 py-2 text-left text-[0.95rem] font-semibold text-[#7b8ba6] no-underline transition duration-200 ease-out hover:bg-[#f3f4ff] hover:text-[#16a34a]"
@@ -92,7 +98,8 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
                         {{ child.label }}
                       </a>
                     }
-                  </div>
+                    </div>
+                  }
                 </div>
               } @else if (item.link) {
                 <a
@@ -100,7 +107,7 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
                   [routerLink]="item.link"
                   routerLinkActive="bg-[#eef0ff] text-[#16a34a]"
                   [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                  (click)="closeSidebarOnMobile()"
+                  (click)="handleTopLevelMenuClick()"
                 >
                   <span class="grid h-5 w-5 shrink-0 place-items-center text-inherit" aria-hidden="true">
                     <ng-container [ngTemplateOutlet]="navIcon" [ngTemplateOutletContext]="{ icon: item.icon }" />
@@ -256,20 +263,54 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
             </button>
 
             <div
-              class="ml-[0.15rem] flex items-center gap-[0.8rem] border-l border-[rgba(138,158,191,0.24)] pl-4 max-[720px]:min-w-0 max-[720px]:flex-1 max-[720px]:justify-end max-[720px]:gap-3 max-[720px]:border-l-0 max-[720px]:pl-0 max-[720px]:text-right"
+              class="relative ml-[0.15rem] border-l border-[rgba(138,158,191,0.24)] pl-4 max-[720px]:min-w-0 max-[720px]:flex-1 max-[720px]:justify-end max-[720px]:border-l-0 max-[720px]:pl-0"
+              (click)="$event.stopPropagation()"
             >
-              <div class="min-w-0 max-[720px]:text-right">
-                <strong class="text-[0.95rem] font-bold tracking-[-0.02em] text-[#1d2a44]">{{
-                  userDisplayName()
-                }}</strong>
-                <span class="mt-[0.1rem] block text-[0.875rem] text-[#7e8eaa]">{{ userRoleLabel() }}</span>
-              </div>
-              <div
-                class="grid h-12 w-12 place-items-center rounded-full border-2 border-white/90 bg-[linear-gradient(135deg,#ffe0b2_0%,#8ed0ff_100%)] text-[0.82rem] font-bold text-[#1d2a44] shadow-[0_2px_8px_rgba(48,72,112,0.12)]"
-                aria-hidden="true"
+              <button
+                type="button"
+                class="flex cursor-pointer items-center gap-[0.8rem] rounded-2xl border-0 bg-transparent p-0 text-left max-[720px]:min-w-0 max-[720px]:justify-end max-[720px]:gap-3 max-[720px]:text-right"
+                [attr.aria-expanded]="profileMenuOpen()"
+                aria-haspopup="menu"
+                aria-label="Open account menu"
+                (click)="toggleProfileMenu()"
               >
-                {{ userInitials() }}
-              </div>
+                <div class="min-w-0 max-[720px]:text-right">
+                  <strong class="text-[0.95rem] font-bold tracking-[-0.02em] text-[#1d2a44]">{{
+                    userDisplayName()
+                  }}</strong>
+                  <span class="mt-[0.1rem] block text-[0.875rem] text-[#7e8eaa]">{{ userRoleLabel() }}</span>
+                </div>
+                <div
+                  class="grid h-12 w-12 place-items-center rounded-full border-2 border-white/90 bg-[linear-gradient(135deg,#ffe0b2_0%,#8ed0ff_100%)] text-[0.82rem] font-bold text-[#1d2a44] shadow-[0_2px_8px_rgba(48,72,112,0.12)]"
+                  aria-hidden="true"
+                >
+                  {{ userInitials() }}
+                </div>
+              </button>
+
+              @if (profileMenuOpen()) {
+                <div
+                  class="absolute right-0 top-[calc(100%+0.65rem)] z-50 grid min-w-[12rem] overflow-hidden rounded-2xl border border-[rgba(138,158,191,0.18)] bg-white p-2 text-left shadow-[0_22px_50px_rgba(48,72,112,0.16)]"
+                  role="menu"
+                >
+                  <button
+                    type="button"
+                    class="flex min-h-11 w-full cursor-pointer items-center rounded-xl border-0 bg-transparent px-3 text-sm font-semibold text-[#344054] transition hover:bg-[#f3f4ff] hover:text-[#16a34a]"
+                    role="menuitem"
+                    (click)="goToSettings()"
+                  >
+                    Settings
+                  </button>
+                  <button
+                    type="button"
+                    class="flex min-h-11 w-full cursor-pointer items-center rounded-xl border-0 bg-transparent px-3 text-sm font-semibold text-[#b42318] transition hover:bg-[#fff4f2]"
+                    role="menuitem"
+                    (click)="logout()"
+                  >
+                    Logout
+                  </button>
+                </div>
+              }
             </div>
           </div>
         </header>
@@ -378,6 +419,8 @@ export class MerchantLayoutComponent {
   protected readonly helpPanelOpen = signal(false);
   protected readonly sidebarOpen = signal(false);
   protected readonly sidebarCollapsed = signal(false);
+  protected readonly profileMenuOpen = signal(false);
+  protected readonly expandedMenus = signal<Record<string, boolean>>({});
 
   @HostListener('window:resize')
   protected handleWindowResize(): void {
@@ -389,6 +432,12 @@ export class MerchantLayoutComponent {
   @HostListener('document:keydown.escape')
   protected handleEscapeKey(): void {
     this.closeSidebar();
+    this.closeProfileMenu();
+  }
+
+  @HostListener('document:click')
+  protected handleDocumentClick(): void {
+    this.closeProfileMenu();
   }
 
   protected openHelp(): void {
@@ -397,6 +446,27 @@ export class MerchantLayoutComponent {
 
   protected closeHelp(): void {
     this.helpPanelOpen.set(false);
+  }
+
+  protected toggleProfileMenu(): void {
+    this.profileMenuOpen.update((open) => !open);
+  }
+
+  protected closeProfileMenu(): void {
+    this.profileMenuOpen.set(false);
+  }
+
+  protected goToSettings(): void {
+    this.closeProfileMenu();
+    this.closeSidebarOnMobile();
+    void this.router.navigate(['/settings']);
+  }
+
+  protected logout(): void {
+    this.closeProfileMenu();
+    this.authService.logout();
+    this.merchantSearch.reset();
+    void this.router.navigate(['/auth/login']);
   }
 
   protected toggleSidebar(): void {
@@ -416,6 +486,28 @@ export class MerchantLayoutComponent {
     if (typeof window !== 'undefined' && window.innerWidth <= 1100) {
       this.closeSidebar();
     }
+  }
+
+  protected handleTopLevelMenuClick(): void {
+    this.expandedMenus.set({});
+    this.closeSidebarOnMobile();
+  }
+
+  protected toggleMenu(label: string): void {
+    this.expandedMenus.update((menus) => ({ ...menus, [label]: !menus[label] }));
+  }
+
+  protected isMenuExpanded(label: string): boolean {
+    return Boolean(this.expandedMenus()[label]);
+  }
+
+  protected isParentActive(item: { link?: string; children?: { link: string }[] }): boolean {
+    const currentPath = this.router.url.split('?')[0]?.split('#')[0] || '';
+    if (item.link && (currentPath === item.link || currentPath.startsWith(`${item.link}/`))) {
+      return true;
+    }
+
+    return Boolean(item.children?.some((child) => currentPath === child.link || currentPath.startsWith(`${child.link}/`)));
   }
 
   private readonly allMenuItems: {
@@ -496,9 +588,7 @@ export class MerchantLayoutComponent {
       return;
     }
 
-    this.authService.logout();
-    this.merchantSearch.reset();
-    void this.router.navigate(['/auth/login']);
+    this.logout();
   }
 
   protected userDisplayName(): string {

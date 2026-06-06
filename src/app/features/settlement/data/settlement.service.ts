@@ -141,6 +141,8 @@ function toSettlementDetailRow(row: SettlementDetailRecord): SummaryTableRow {
     statusTone: statusClassForLabel(status),
     amountText: formatSettlementAmount(row.amount, currency),
     transactionTypeText: row.cardType?.trim() || row.transactionType?.trim() || '--',
+    detailText: settlementStatusText(row.settlementStatus),
+    detailTone: settlementStatusTone(row.settlementStatus),
     metaText: formatDisplayDate(row.createdDate)
   };
 }
@@ -168,6 +170,14 @@ function labelForSettlementStatus(row: SettlementDetailRecord): string {
       return message ? titleCase(message) : 'Unknown';
     }
   }
+}
+
+function settlementStatusText(value: string | null): string {
+  return value?.trim() || 'Pending';
+}
+
+function settlementStatusTone(value: string | null): string {
+  return statusClassForLabel(settlementStatusText(value));
 }
 
 function normalizePageIndex(currentPage: number, totalPages: number): number {
