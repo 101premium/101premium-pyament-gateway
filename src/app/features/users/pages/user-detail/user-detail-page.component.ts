@@ -4,6 +4,8 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { AuthService } from '../../../../core/auth/auth.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { UserDetailView } from '../../data/users.models';
 import { UsersService } from '../../data/users.service';
 
@@ -85,6 +87,53 @@ import { UsersService } from '../../data/users.service';
               <span class="mt-1 block text-sm text-[#607089]">{{ user()!.loginStatusText }}</span>
             </div>
           </div>
+
+          <div
+            *ngIf="canManageUser()"
+            class="mt-5 border-t border-[rgba(138,158,191,0.14)] pt-5"
+          >
+            <p class="m-0 text-xs font-semibold uppercase tracking-[0.16em] text-[#8fa0b8]">
+              Account access
+            </p>
+            <p class="mt-2 mb-0 text-sm leading-6 text-[#607089]">
+              Clear this user's failed login attempts and restore sign-in access.
+            </p>
+            <button
+              type="button"
+              class="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-[#16803c] bg-[#1c7f3d] px-4 text-sm font-bold text-white transition hover:bg-[#146b33] disabled:cursor-not-allowed disabled:opacity-65"
+              [disabled]="isUnlocking() || isUpdatingStatus()"
+              (click)="unlockUser()"
+            >
+              {{ isUnlocking() ? 'Unlocking...' : 'Unlock user' }}
+            </button>
+            <button
+              type="button"
+              class="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl border px-4 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-65"
+              [ngClass]="
+                isActiveUser()
+                  ? 'border-[#b42318] bg-[#b42318] text-white hover:bg-[#912018]'
+                  : 'border-[#16803c] bg-white text-[#16803c] hover:bg-[#f0fdf4]'
+              "
+              [disabled]="isUnlocking() || isUpdatingStatus()"
+              (click)="toggleUserStatus()"
+            >
+              {{ statusActionLabel() }}
+            </button>
+            <p
+              *ngIf="unlockErrorMessage()"
+              class="mt-3 mb-0 text-sm font-medium text-[#b42318]"
+              role="alert"
+            >
+              {{ unlockErrorMessage() }}
+            </p>
+            <p
+              *ngIf="statusErrorMessage()"
+              class="mt-3 mb-0 text-sm font-medium text-[#b42318]"
+              role="alert"
+            >
+              {{ statusErrorMessage() }}
+            </p>
+          </div>
         </aside>
       </section>
     </main>
@@ -94,10 +143,93 @@ export class UserDetailPageComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly usersService = inject(UsersService);
+  private readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
 
   protected readonly user = signal<UserDetailView | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal('');
+  protected readonly isUnlocking = signal(false);
+  protected readonly unlockErrorMessage = signal('');
+  protected readonly isUpdatingStatus = signal(false);
+  protected readonly statusErrorMessage = signal('');
+
+  protected canManageUser(): boolean {
+    const permissions = this.authService.getSession()?.permissions ?? [];
+    return (
+      permissions.includes('ROLE_ADMIN') ||
+      permissions.includes('ROLE_MERCHANT_ADMIN') ||
+      permissions.includes('ROLE_UPDATE_USERS')
+    );
+  }
+
+  protected isActiveUser(): boolean {
+    return this.user()?.statusText.toLowerCase() === 'active';
+  }
+
+  protected statusActionLabel(): string {
+    if (this.isUpdatingStatus()) {
+      return this.isActiveUser() ? 'Disabling...' : 'Enabling...';
+    }
+    return this.isActiveUser() ? 'Disable user' : 'Enable user';
+  }
+
+  protected toggleUserStatus(): void {
+    const uniqueId = this.user()?.uniqueId.trim() ?? '';
+    if (!uniqueId || uniqueId === '—' || this.isUpdatingStatus() || this.isUnlocking()) {
+      return;
+    }
+
+    const enabling = !this.isActiveUser();
+    this.isUpdatingStatus.set(true);
+    this.statusErrorMessage.set('');
+
+    this.usersService
+      .setUserEnabled({ uniqueId, status: enabling ? '1' : '2' })
+      .pipe(finalize(() => this.isUpdatingStatus.set(false)))
+      .subscribe({
+        next: () => {
+          this.toastService.show(
+            `User ${enabling ? 'enabled' : 'disabled'} successfully.`,
+            'success'
+          );
+          this.loadUser(uniqueId);
+        },
+        error: (error: unknown) => {
+          this.statusErrorMessage.set(
+            this.resolveErrorMessage(
+              error,
+              `Unable to ${enabling ? 'enable' : 'disable'} this user right now.`
+            )
+          );
+        }
+      });
+  }
+
+  protected unlockUser(): void {
+    const uniqueId = this.user()?.uniqueId.trim() ?? '';
+    if (!uniqueId || uniqueId === '—' || this.isUnlocking()) {
+      return;
+    }
+
+    this.isUnlocking.set(true);
+    this.unlockErrorMessage.set('');
+
+    this.usersService
+      .unlockUser({ uniqueId })
+      .pipe(finalize(() => this.isUnlocking.set(false)))
+      .subscribe({
+        next: () => {
+          this.toastService.show('User unlocked successfully.', 'success');
+          this.loadUser(uniqueId);
+        },
+        error: (error: unknown) => {
+          this.unlockErrorMessage.set(
+            this.resolveErrorMessage(error, 'Unable to unlock this user right now.')
+          );
+        }
+      });
+  }
 
   constructor() {
     this.route.paramMap
@@ -131,7 +263,10 @@ export class UserDetailPageComponent {
     ];
   }
 
-  private resolveErrorMessage(error: unknown): string {
+  private resolveErrorMessage(
+    error: unknown,
+    fallback = 'Unable to load this user right now.'
+  ): string {
     if (error instanceof HttpErrorResponse) {
       if (typeof error.error?.description === 'string' && error.error.description.trim()) {
         return error.error.description;
@@ -148,7 +283,7 @@ export class UserDetailPageComponent {
       return error.message;
     }
 
-    return 'Unable to load this user right now.';
+    return fallback;
   }
 
   private loadUser(uniqueId: string): void {

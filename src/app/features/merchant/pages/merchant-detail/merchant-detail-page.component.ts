@@ -360,6 +360,7 @@ export class MerchantDetailPageComponent {
       { label: 'Address', value: m.businessAddress },
       { label: 'CAC', value: m.cacNumber },
       { label: 'TIN', value: m.tinNumber },
+      { label: 'Processor', value: m.processor },
       ...(m.reason ? [{ label: 'Reason', value: m.reason }] : []),
       { label: 'Created', value: m.createdDate },
       { label: 'Updated', value: m.updatedDate }

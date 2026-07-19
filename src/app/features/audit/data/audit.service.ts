@@ -33,7 +33,7 @@ export class AuditService {
   getAuditLogs(query: AuditQueryParams): Observable<AuditPageResult> {
     const session = this.authService.getSession();
     let params = new HttpParams()
-      .set('page', String(query.page))
+      .set('page', String(query.page + 1))
       .set('size', String(query.size));
 
     const searchParam = query.searchParam?.trim();

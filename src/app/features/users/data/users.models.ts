@@ -107,6 +107,15 @@ export interface CreateUserPayload {
   roleId: number;
 }
 
+export interface UnlockUserPayload {
+  uniqueId: string;
+}
+
+export interface EnableDisableUserPayload {
+  uniqueId: string;
+  status: '1' | '2';
+}
+
 export interface RoleOption {
   id: number;
   name: string;

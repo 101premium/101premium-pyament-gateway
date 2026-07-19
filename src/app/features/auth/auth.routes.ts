@@ -7,5 +7,8 @@ import { PasswordActivationPageComponent } from './pages/password-activation/pas
 export const authRoutes: Routes = [
   { path: 'login', component: LoginPageComponent, canActivate: [] },
   { path: 'forgot-password', component: ForgotPasswordPageComponent, canActivate: [guestGuard] },
-  { path: 'account/change-password/:resetToken', component: PasswordActivationPageComponent }
+  {
+    path: 'account/change-password/:resetToken/:userId',
+    component: PasswordActivationPageComponent
+  }
 ];

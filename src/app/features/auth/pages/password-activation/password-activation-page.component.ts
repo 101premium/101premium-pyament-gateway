@@ -207,6 +207,7 @@ export class PasswordActivationPageComponent {
   protected readonly successMessage = signal('');
   protected readonly showPassword = signal(false);
   protected readonly showConfirmPassword = signal(false);
+  private readonly userId = this.route.snapshot.paramMap.get('userId')?.trim() ?? '';
   private readonly resetToken = this.route.snapshot.paramMap.get('resetToken')?.trim() ?? '';
 
   protected togglePasswordVisibility(): void {
@@ -245,7 +246,7 @@ export class PasswordActivationPageComponent {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    if (!this.resetToken) {
+    if (!this.userId || !this.resetToken) {
       this.errorMessage.set('This password reset link is incomplete. Request a new link and try again.');
       return;
     }
@@ -265,6 +266,7 @@ export class PasswordActivationPageComponent {
     this.isSubmitting.set(true);
     this.authService
       .activatePassword({
+        uniqueId: this.userId,
         resetToken: this.resetToken,
         password
       })

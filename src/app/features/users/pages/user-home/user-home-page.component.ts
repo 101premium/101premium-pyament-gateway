@@ -15,6 +15,7 @@ import { RolesService } from '../../data/roles.service';
 import { UsersService } from '../../data/users.service';
 import { RoleStatData, UserStatData } from '../../data/users.models';
 import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 type UserTab = 'users' | 'roles';
 
@@ -40,6 +41,7 @@ type UserTab = 'users' | 'roles';
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap gap-3">
           <button
+            *ngIf="canViewUsers()"
             type="button"
             class="min-h-11 rounded-full px-5 text-sm font-semibold transition"
             [class.ui-tab-pill-active]="activeTab() === 'users'"
@@ -53,6 +55,7 @@ type UserTab = 'users' | 'roles';
           </button>
 
           <button
+            *ngIf="canViewRoles()"
             type="button"
             class="min-h-11 rounded-full px-5 text-sm font-semibold transition"
             [class.ui-tab-pill-active]="activeTab() === 'roles'"
@@ -67,7 +70,7 @@ type UserTab = 'users' | 'roles';
         </div>
 
         <a
-          *ngIf="activeTab() === 'users'"
+          *ngIf="activeTab() === 'users' && canCreateUsers()"
           routerLink="/teams/users/new"
           class="primary-btn min-w-[180px]"
         >
@@ -75,7 +78,7 @@ type UserTab = 'users' | 'roles';
         </a>
 
         <a
-          *ngIf="activeTab() === 'roles'"
+          *ngIf="activeTab() === 'roles' && canManageRoles()"
           routerLink="/teams/roles/new"
           class="primary-btn min-w-[180px]"
         >
@@ -196,9 +199,56 @@ export class UserHomePageComponent {
   private readonly usersService = inject(UsersService);
   private readonly rolesService = inject(RolesService);
   private readonly merchantSearch = inject(MerchantSearchService);
+  private readonly authService = inject(AuthService);
   protected readonly pageSize = 10;
 
   protected readonly activeTab = signal<UserTab>('users');
+
+  protected canViewUsers(): boolean {
+    return this.hasAnyPermission(
+      'ROLE_ADMIN',
+      'ROLE_MERCHANT_ADMIN',
+      'ROLE_VIEW_MERCHANT_USERS',
+      'ROLE_CREATE_MERCHANT_USERS',
+      'ROLE_VIEW_USERS',
+      'ROLE_CREATE_USERS',
+      'ROLE_UPDATE_USERS'
+    );
+  }
+
+  protected canCreateUsers(): boolean {
+    return this.hasAnyPermission(
+      'ROLE_ADMIN',
+      'ROLE_MERCHANT_ADMIN',
+      'ROLE_CREATE_MERCHANT_USERS',
+      'ROLE_CREATE_USERS'
+    );
+  }
+
+  protected canViewRoles(): boolean {
+    return this.hasAnyPermission(
+      'ROLE_ADMIN',
+      'ROLE_MERCHANT_ADMIN',
+      'ROLE_VIEW_MERCHANT_ROLE',
+      'ROLE_UPDATE_MERCHANT_ROLE',
+      'ROLE_CREATE_MERCHANT_ROLE',
+      'ROLE_VIEW_ROLE',
+      'ROLE_UPDATE_ROLE',
+      'ROLE_CREATE_ROLE',
+      'ROLE_ASSIGN_PERMISSION',
+      'ROLE_ENABLE/DSIABLE_ROLE'
+    );
+  }
+
+  protected canManageRoles(): boolean {
+    return this.hasAnyPermission(
+      'ROLE_ADMIN',
+      'ROLE_MERCHANT_ADMIN',
+      'ROLE_CREATE_MERCHANT_ROLE',
+      'ROLE_CREATE_ROLE',
+      'ROLE_ASSIGN_PERMISSION'
+    );
+  }
   protected readonly userStats = signal<UserStatData | null>(null);
   protected readonly userStatsLoading = signal(false);
   protected readonly userStatsError = signal('');
@@ -268,11 +318,21 @@ export class UserHomePageComponent {
   );
 
   constructor() {
-    this.loadUserStats();
+    if (!this.canViewUsers() && this.canViewRoles()) {
+      this.activeTab.set('roles');
+      this.loadRoleStats();
+    } else {
+      this.loadUserStats();
+    }
 
     this.merchantSearch.debouncedQuery$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((searchParam) => this.loadActiveTab(searchParam, 0));
+  }
+
+  private hasAnyPermission(...required: string[]): boolean {
+    const permissions = this.authService.getSession()?.permissions ?? [];
+    return required.some((permission) => permissions.includes(permission));
   }
 
   protected goToPreviousPage(): void {

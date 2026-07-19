@@ -70,7 +70,7 @@ export class MerchantService {
   }
 
   getMerchants(query: MerchantQueryParams): Observable<MerchantPageResult> {
-    const params = new HttpParams().set('page', String(query.page)).set('size', String(query.size));
+    const params = new HttpParams().set('page', String(query.page + 1)).set('size', String(query.size));
 
     return this.http.get<MerchantEnvelope>(this.merchantPageUrl, { params }).pipe(
       map((response) => {
@@ -520,6 +520,7 @@ function mapMerchantDetailView(row: Record<string, unknown>): MerchantDetailView
     businessAddress: stringValue(row['businessAddress']) || '—',
     cacNumber: stringValue(row['cacNumber']) || '—',
     tinNumber: stringValue(row['tinNumber']) || '—',
+    processor: stringValue(row['processor']) || '—',
     statusText,
     statusTone,
     approved: approvedCode,

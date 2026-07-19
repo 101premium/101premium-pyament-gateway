@@ -9,6 +9,8 @@ import {
   AuthSession,
   ChangePasswordRequest,
   ChangePasswordResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
   LoginRequest,
   LoginResponse
 } from './auth.models';
@@ -21,6 +23,7 @@ export class AuthService {
   private readonly loginUrl = `${environment.apiBaseUrl}/auth/login`;
   private readonly changePasswordUrl = `${environment.apiBaseUrl}/user/changepassword`;
   private readonly activatePasswordUrl = `${environment.apiBaseUrl}/user/passwordactivation`;
+  private readonly forgotPasswordUrl = `${environment.apiBaseUrl}/user/forgetpassword`;
 
   login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http
@@ -43,6 +46,15 @@ export class AuthService {
 
   activatePassword(payload: ActivatePasswordRequest): Observable<ActivatePasswordResponse> {
     return this.http.put<ActivatePasswordResponse>(this.activatePasswordUrl, payload, {
+      headers: {
+        accept: '*/*',
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+
+  forgotPassword(payload: ForgotPasswordRequest): Observable<ForgotPasswordResponse> {
+    return this.http.put<ForgotPasswordResponse>(this.forgotPasswordUrl, payload, {
       headers: {
         accept: '*/*',
         'Content-Type': 'application/json'

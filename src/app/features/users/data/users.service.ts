@@ -16,6 +16,8 @@ import {
 import { SummaryTableRow } from '../../../shared/components/payment-transactions-table/payment-transactions-table.component';
 import {
   CreateUserPayload,
+  EnableDisableUserPayload,
+  UnlockUserPayload,
   UserDetailResponse,
   UserDetailView,
   UserListResponse,
@@ -38,7 +40,7 @@ export class UsersService {
 
   getUsers(query: UserQueryParams): Observable<UserPageResult> {
     let params = new HttpParams()
-      .set('page', String(query.page))
+      .set('page', String(query.page + 1))
       .set('size', String(query.size));
 
     const search = query.searchParam?.trim();
@@ -77,6 +79,18 @@ export class UsersService {
 
   createUser(payload: CreateUserPayload): Observable<unknown> {
     return this.http.post(this.addUserUrl, payload);
+  }
+
+  unlockUser(payload: UnlockUserPayload): Observable<unknown> {
+    return this.http.put(`${this.userBaseUrl}/unlock`, payload, {
+      headers: { accept: '*/*' }
+    });
+  }
+
+  setUserEnabled(payload: EnableDisableUserPayload): Observable<unknown> {
+    return this.http.put(`${this.userBaseUrl}/enabledisenable`, payload, {
+      headers: { accept: '*/*' }
+    });
   }
 }
 
@@ -210,12 +224,6 @@ function resolveUserStatus(row: Record<string, unknown>): string {
     'Active';
 
   const normalized = raw.toLowerCase();
-  if (normalized === '00' || normalized.includes('active') || normalized.includes('enable')) {
-    return 'Active';
-  }
-  if (normalized === '01' || normalized.includes('pending')) {
-    return 'Pending';
-  }
   if (
     normalized === '02' ||
     normalized.includes('inactive') ||
@@ -225,19 +233,25 @@ function resolveUserStatus(row: Record<string, unknown>): string {
   ) {
     return 'Inactive';
   }
+  if (normalized === '00' || normalized.includes('active') || normalized.includes('enable')) {
+    return 'Active';
+  }
+  if (normalized === '01' || normalized.includes('pending')) {
+    return 'Pending';
+  }
   return titleCase(raw.replace(/_/g, ' '));
 }
 
 function userStatusTone(status: string): string {
   const normalized = status.toLowerCase();
+  if (normalized.includes('inactive') || normalized.includes('suspend') || normalized.includes('block')) {
+    return 'failed';
+  }
   if (normalized.includes('active')) {
     return 'succeeded';
   }
   if (normalized.includes('pending')) {
     return 'pending';
-  }
-  if (normalized.includes('inactive') || normalized.includes('suspend') || normalized.includes('block')) {
-    return 'failed';
   }
   return 'pending';
 }

@@ -23,7 +23,7 @@ export interface ChangePasswordResponse {
 }
 
 export interface ActivatePasswordRequest {
-  uniqueId?: string;
+  uniqueId: string;
   resetToken: string;
   password: string;
 }
@@ -34,8 +34,19 @@ export interface ActivatePasswordResponse {
   data?: unknown;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  code: string;
+  description: string;
+  data?: unknown;
+}
+
 export interface AuthSession {
   accessToken: string;
+  merchantId?: string;
   phone: string;
   email: string;
   lastName: string;

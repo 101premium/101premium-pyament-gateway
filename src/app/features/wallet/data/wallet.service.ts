@@ -17,7 +17,7 @@ export class WalletService {
 
   getWalletTransactions(page: number, size: number): Observable<WalletTransactionPageResult> {
     const params = new HttpParams()
-      .set('page', String(page))
+      .set('page', String(page + 1))
       .set('size', String(size));
 
     return this.http

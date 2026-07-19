@@ -61,6 +61,13 @@ import { HelpAiPanelComponent } from '../components/help-ai-panel/help-ai-panel.
           </button>
         </div>
 
+        @if (merchantId(); as id) {
+          <div class="mb-3 rounded-2xl border border-[rgba(138,158,191,0.16)] bg-[#f8f9ff] px-4 py-3 text-center">
+            <p class="m-0 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[#91a0bb]">Merchant ID</p>
+            <p class="mt-1 mb-0 break-all font-mono text-sm font-semibold text-[#2f3743]">{{ id }}</p>
+          </div>
+        }
+
         <div class="grid gap-[0.9rem]">
           <p class="m-0 text-[0.78rem] font-bold uppercase tracking-[0.24em] text-[#91a0bb]">Menu</p>
           <nav class="grid gap-[0.45rem]">
@@ -422,6 +429,10 @@ export class MerchantLayoutComponent {
   protected readonly profileMenuOpen = signal(false);
   protected readonly expandedMenus = signal<Record<string, boolean>>({});
 
+  protected merchantId(): string {
+    return this.authService.getSession()?.merchantId?.trim() ?? '';
+  }
+
   @HostListener('window:resize')
   protected handleWindowResize(): void {
     if (typeof window !== 'undefined' && window.innerWidth >= 1101) {
@@ -518,49 +529,69 @@ export class MerchantLayoutComponent {
     permission?: string[];
     children?: { label: string; link: string; exact?: boolean }[];
   }[] = [
-      { label: 'Overview', icon: 'home', link: '/dashboard', exact: true, 
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
+      {
+        label: 'Overview', icon: 'home', link: '/dashboard', exact: true,
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_ADMIN_USER']
+      },
       {
         label: 'Payments',
         icon: 'credit-card',
         link: '/payment',
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_PAYMENT'],
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_PAYMENT', 'ROLE_ADMIN_USER'],
         children: [
           { label: 'StableCoin Transaction', link: '/payment', exact: true },
           { label: 'Card Transaction', link: '/payment/card-transactions', exact: true }
         ]
       },
-      { label: 'Payout', icon: 'banknotes', link: '/payout', 
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
-      { label: 'Balance', icon: 'banknotes', link: '/balance', 
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
-      { label: 'Settlement', icon: 'clipboard-document-list', link: '/settlement',
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
-      { label: 'Wallet', icon: 'wallet', link: '/wallet', 
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN'] },
-      { label: 'Merchants', icon: 'building-storefront', link: '/merchants', 
-        permission: ['ROLE_ADMIN'] },
+      {
+        label: 'Payout', icon: 'banknotes', link: '/payout',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_ADMIN_USER']
+      },
+      {
+        label: 'Balance', icon: 'banknotes', link: '/balance',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_ADMIN_USER']
+      },
+      {
+        label: 'Settlement', icon: 'clipboard-document-list', link: '/settlement',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_ADMIN_USER', 'ROLE_SETTLEMENT']
+      },
+      {
+        label: 'Wallet', icon: 'wallet', link: '/wallet',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_ADMIN_USER']
+      },
+      {
+        label: 'Merchants', icon: 'building-storefront', link: '/merchants',
+        permission: ['ROLE_ADMIN', 'ROLE_VIEW_MERCHANT', 'ROLE_ADMIN_USER', 'ROLE_CREATE_MERCHANT']
+      },
       {
         label: 'Payment Link', icon: 'link', link: '/payment-link',
         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_CREATE_MERCHANT',
-          'ROLE_VIEW_MERCHANT'
+          'ROLE_VIEW_MERCHANT', 'ROLE_ADMIN_USER'
         ]
       },
       {
         label: 'Teams', icon: 'users', link: '/teams',
-         permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_VIEW_MERCHANT_USERS',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_VIEW_MERCHANT_USERS',
           'ROLE_CREATE_MERCHANT_USERS', 'ROLE_CREATE_MERCHANT_ROLE',
           'ROLE_UPDATE_MERCHANT_ROLE', 'ROLE_VIEW_MERCHANT_ROLE',
           'ROLE_VIEW_ROLE', 'ROLE_UPDATE_ROLE', 'ROLE_CREATE_ROLE',
-          'ROLE_VIEW_USERS','ROLE_CREATE_USERS'
+          'ROLE_ASSIGN_PERMISSION', 'ROLE_ENABLE/DSIABLE_ROLE',
+          'ROLE_VIEW_USERS', 'ROLE_CREATE_USERS', 'ROLE_UPDATE_USERS',
+          'ROLE_ADMIN_USER', 'ROLE_CREATE_ROLE'
         ]
       },
-      { label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit',
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_AUDIT'] },
-      { label: 'API Keys', icon: 'key', link: '/api-keys',
-        permission: ['ROLE_MERCHANT_ADMIN'] },
-      { label: 'Settings', icon: 'cog', link: '/settings',
-        permission: [] }
+      {
+        label: 'Audit Trail', icon: 'clipboard-document-list', link: '/audit',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_MERCHANT_AUDIT', 'ROLE_ADMIN_USER', 'ROLE_AUDIT', 'ROLE_COMPLIANCE']
+      },
+      {
+        label: 'API Keys', icon: 'key', link: '/api-keys',
+        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN_USER']
+      },
+      {
+        label: 'Settings', icon: 'cog', link: '/settings',
+        permission: []
+      }
     ];
 
   protected get menuItems() {

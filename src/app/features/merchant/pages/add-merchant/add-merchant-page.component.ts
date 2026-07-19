@@ -118,6 +118,14 @@ const COUNTRY_CODE_PHONE_PATTERN = /^234\d{7,14}$/;
                 <span class="text-sm font-semibold text-[#334155]">TIN</span>
                 <input class="add-merchant-input" formControlName="tinNumber" placeholder="Tax ID" />
               </label>
+              <label class="grid gap-1.5 md:col-span-2">
+                <span class="text-sm font-semibold text-[#334155]">Processor</span>
+                <input
+                  class="add-merchant-input"
+                  formControlName="processor"
+                  placeholder="Payment processor"
+                />
+              </label>
             </fieldset>
 
             <fieldset
@@ -220,6 +228,7 @@ const COUNTRY_CODE_PHONE_PATTERN = /^234\d{7,14}$/;
             <div class="py-3">{{ preview().businessPhone }}</div>
             <div class="py-3 break-words leading-relaxed">{{ preview().businessAddress }}</div>
             <div class="py-3 text-[#64748b]">{{ preview().cacTin }}</div>
+            <div class="py-3 text-[#64748b]">Processor: {{ preview().processor }}</div>
           </div>
         </aside>
       </section>
@@ -274,6 +283,7 @@ export class AddMerchantPageComponent {
     businessAddress: ['', Validators.required],
     cacNumber: ['', Validators.required],
     tinNumber: ['', Validators.required],
+    processor: ['', Validators.required],
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
@@ -291,7 +301,8 @@ export class AddMerchantPageComponent {
       businessEmail: v.businessEmail?.trim() || 'business@email.com',
       businessPhone: v.businessPhone?.trim() || '—',
       businessAddress: v.businessAddress?.trim() || 'Address',
-      cacTin: reg || 'CAC / TIN'
+      cacTin: reg || 'CAC / TIN',
+      processor: v.processor?.trim() || '—'
     };
   });
 
@@ -316,6 +327,7 @@ export class AddMerchantPageComponent {
         businessAddress: v.businessAddress.trim(),
         cacNumber: v.cacNumber.trim(),
         tinNumber: v.tinNumber.trim(),
+        processor: v.processor.trim(),
         firstName: v.firstName.trim(),
         lastName: v.lastName.trim(),
         email: v.email.trim(),

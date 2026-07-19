@@ -57,7 +57,8 @@ function isProtectedApiRequest(url: string): boolean {
 
   return ![
     `${apiBasePath}/auth/login`,
-    `${apiBasePath}/user/passwordactivation`
+    `${apiBasePath}/user/passwordactivation`,
+    `${apiBasePath}/user/forgetpassword`
   ].some((excludedPath) => requestPath.startsWith(excludedPath));
 }
 

@@ -14,8 +14,18 @@ export const authHeadersInterceptor: HttpInterceptorFn = (req, next) => {
   const appMode = inject(AppModeService);
   const session = authService.getSession();
   const isAuthEndpoint = req.url.startsWith(`${environment.apiBaseUrl}/auth/`);
+  const requestUrl = req.url.split(/[?#]/, 1)[0].replace(/\/+$/, '');
+  const isPublicUserEndpoint = [
+    `${environment.apiBaseUrl}/user/passwordactivation`,
+    `${environment.apiBaseUrl}/user/forgetpassword`
+  ].includes(requestUrl);
 
   let headers = req.headers;
+
+  // Public password flows must never receive a stale session token.
+  if (isPublicUserEndpoint && headers.has('Authorization')) {
+    headers = headers.delete('Authorization');
+  }
 
   if (!headers.has('accept')) {
     headers = headers.set('accept', '*/*');
@@ -25,7 +35,12 @@ export const authHeadersInterceptor: HttpInterceptorFn = (req, next) => {
     headers = headers.set('appMode', String(appMode.mode()));
   }
 
-  if (!isAuthEndpoint && session?.accessToken && !headers.has('Authorization')) {
+  if (
+    !isAuthEndpoint &&
+    !isPublicUserEndpoint &&
+    session?.accessToken &&
+    !headers.has('Authorization')
+  ) {
     headers = headers.set('Authorization', `Bearer ${session.accessToken}`);
   }
 

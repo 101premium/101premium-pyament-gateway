@@ -2,7 +2,7 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
-    path: 'auth/account/change-password/:resetToken',
+    path: 'auth/account/change-password/:resetToken/:userId',
     renderMode: RenderMode.Server
   },
   {

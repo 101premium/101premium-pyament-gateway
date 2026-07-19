@@ -50,7 +50,7 @@ export class PaymentsService {
    */
   getTransactions(query: PaymentQueryParams): Observable<PaymentTransactionPageResult> {
     let params = new HttpParams()
-      .set('page', String(query.page))
+      .set('page', String(query.page + 1))
       .set('size', String(query.size));
     const merchantId = query.merchantId?.trim();
     const cryptoMode = query.cryptoMode?.trim();
@@ -76,7 +76,7 @@ export class PaymentsService {
 
   getCardTransactions(query: PaymentQueryParams): Observable<PaymentTransactionPageResult> {
     let params = new HttpParams()
-      .set('page', String(query.page))
+      .set('page', String(query.page + 1))
       .set('size', String(query.size));
 
     const search = query.searchParam?.trim();
