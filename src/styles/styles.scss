@@ -1028,6 +1028,22 @@ input {
   padding: 0;
 }
 
+.card-transactions-card {
+  overflow-x: auto;
+}
+
+.card-transactions-card .table-head,
+.card-transactions-card .transaction-row {
+  min-width: 68rem;
+}
+
+.identifier-cell {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .table-head,
 .transaction-row {
   grid-template-columns: minmax(0, 1.7fr) 0.85fr 0.8fr 0.45fr;
@@ -1361,6 +1377,11 @@ input {
 
   .transaction-row {
     gap: 0.7rem;
+  }
+
+  .card-transactions-card .transaction-row {
+    min-width: 0;
+    grid-template-columns: 1fr !important;
   }
 
   .merchant-footer div {

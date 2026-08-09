@@ -7,6 +7,36 @@ export interface SettlementQueryParams {
   size: number;
 }
 
+export interface SettlementDownloadQuery {
+  merchantId?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface SettlementDownloadResponse {
+  code: string;
+  description: string;
+  data: string;
+}
+
+export interface SettlementUploadRowError {
+  row: number;
+  cellErrMsg: string[];
+}
+
+export interface SettlementUploadResult {
+  totalRecords: number;
+  successCount: number;
+  failedCount: number;
+  errors: SettlementUploadRowError[];
+}
+
+export interface SettlementUploadResponse {
+  code: string;
+  description: string;
+  data: SettlementUploadResult;
+}
+
 export interface SettlementPageRecord {
   merchantId: string;
   merchantName: string;

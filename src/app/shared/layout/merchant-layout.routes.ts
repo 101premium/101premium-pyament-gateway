@@ -22,6 +22,10 @@ import { SettingsHomePageComponent } from '../../features/settings/pages/setting
 import { ChangePasswordPageComponent } from '../../features/settings/pages/change-password/change-password-page.component';
 import { SettlementHomePageComponent } from '../../features/settlement/pages/settlement-home/settlement-home-page.component';
 import { SettlementDetailPageComponent } from '../../features/settlement/pages/settlement-detail/settlement-detail-page.component';
+import { SettlementUploadPageComponent } from '../../features/settlement/pages/settlement-upload/settlement-upload-page.component';
+import { settlementUploadGuard } from '../../features/settlement/guards/settlement-upload.guard';
+import { settlementDetailsGuard } from '../../features/settlement/guards/settlement-details.guard';
+import { settlementPageGuard } from '../../features/settlement/guards/settlement-page.guard';
 import { MerchantHomePageComponent } from '../../features/merchant/pages/merchant-home/merchant-home-page.component';
 import { MerchantDetailPageComponent } from '../../features/merchant/pages/merchant-detail/merchant-detail-page.component';
 import { AddMerchantPageComponent } from '../../features/merchant/pages/add-merchant/add-merchant-page.component';
@@ -32,8 +36,9 @@ export const merchantLayoutRoutes: Routes = [
   { path: 'dashboard', component: DashboardHomePageComponent },
   { path: 'balance', component: BalanceHomePageComponent },
   { path: 'wallet', component: WalletHomePageComponent },
-  { path: 'settlement/details', component: SettlementDetailPageComponent },
-  { path: 'settlement', component: SettlementHomePageComponent },
+  { path: 'settlement/details', component: SettlementDetailPageComponent, canActivate: [settlementDetailsGuard] },
+  { path: 'settlement/upload', component: SettlementUploadPageComponent, canActivate: [settlementUploadGuard] },
+  { path: 'settlement', component: SettlementHomePageComponent, canActivate: [settlementPageGuard] },
   { path: 'transactions', component: PaymentHomePageComponent },
   { path: 'payment-link', component: PaymentLinkHomePageComponent },
   { path: 'payout', component: PayoutHomePageComponent },

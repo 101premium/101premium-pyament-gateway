@@ -20,6 +20,8 @@ export interface SummaryTableRow {
   amountText?: string;
   transactionType?: string;
   transactionTypeText?: string;
+  merchantId?: string;
+  transactionId?: string;
   detail?: string;
   detailText?: string;
   detailTone?: string;
@@ -33,6 +35,8 @@ export interface SummaryTableHeaders {
   amount?: string;
   meta?: string;
   transactionType?: string;
+  merchantId?: string;
+  transactionId?: string;
   detail?: string;
 }
 
@@ -132,6 +136,14 @@ export interface SummaryTableHeaders {
                 <span class="transaction-type-cell">{{ transactionTypeText(row) }}</span>
               }
 
+              @if (showsColumn('merchantId')) {
+                <span class="transaction-type-cell identifier-cell" [title]="row.merchantId || ''">{{ row.merchantId || '--' }}</span>
+              }
+
+              @if (showsColumn('transactionId')) {
+                <span class="transaction-type-cell identifier-cell" [title]="row.transactionId || ''">{{ row.transactionId || '--' }}</span>
+              }
+
               @if (showsColumn('detail')) {
                 <span class="status-pill" [class]="detailClass(row)">{{ detailText(row) }}</span>
               }
@@ -165,6 +177,14 @@ export interface SummaryTableHeaders {
 
               @if (showsColumn('transactionType')) {
                 <span class="transaction-type-cell">{{ transactionTypeText(row) }}</span>
+              }
+
+              @if (showsColumn('merchantId')) {
+                <span class="transaction-type-cell identifier-cell" [title]="row.merchantId || ''">{{ row.merchantId || '--' }}</span>
+              }
+
+              @if (showsColumn('transactionId')) {
+                <span class="transaction-type-cell identifier-cell" [title]="row.transactionId || ''">{{ row.transactionId || '--' }}</span>
               }
 
               @if (showsColumn('detail')) {
@@ -203,6 +223,8 @@ export class SummaryTableComponent {
       ...(headers.status ? [{ key: 'status', label: headers.status }] : []),
       ...(headers.amount ? [{ key: 'amount', label: headers.amount }] : []),
       ...(headers.transactionType ? [{ key: 'transactionType', label: headers.transactionType }] : []),
+      ...(headers.merchantId ? [{ key: 'merchantId', label: headers.merchantId }] : []),
+      ...(headers.transactionId ? [{ key: 'transactionId', label: headers.transactionId }] : []),
       ...(headers.detail ? [{ key: 'detail', label: headers.detail }] : []),
       ...(headers.meta ? [{ key: 'meta', label: headers.meta }] : [])
     ];
@@ -267,6 +289,9 @@ export class SummaryTableComponent {
         return '0.8fr';
       case 'transactionType':
         return '0.9fr';
+      case 'merchantId':
+      case 'transactionId':
+        return 'minmax(7rem, 1fr)';
       case 'detail':
         return '0.9fr';
       case 'meta':

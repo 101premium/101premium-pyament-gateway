@@ -2,10 +2,25 @@
 export interface PaymentQueryParams {
   searchParam?: string;
   merchantId?: string;
+  startDate?: string;
+  endDate?: string;
   cryptoMode?: string;
   page: number;
   size: number;
   routePrefix?: string;
+}
+
+export interface CardTransactionDownloadQuery {
+  searchParam?: string;
+  merchantId?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface CardTransactionDownloadResponse {
+  code: string;
+  description: string;
+  data: string;
 }
 
 /** One element of `data.data` from GET …/transaction/page. */
@@ -67,6 +82,8 @@ export interface PaymentTransaction {
   statusClass: string;
   amount: string;
   transactionType: string;
+  merchantId?: string;
+  transactionId?: string;
   date: string;
 }
 

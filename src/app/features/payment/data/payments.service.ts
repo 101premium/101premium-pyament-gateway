@@ -12,6 +12,8 @@ import {
 } from '../../../shared/utils/format.utils';
 import {
   PaymentQueryParams,
+  CardTransactionDownloadQuery,
+  CardTransactionDownloadResponse,
   PaymentAsset,
   PaymentAssetNetwork,
   PaymentAssetNetworksResponse,
@@ -36,6 +38,7 @@ export class PaymentsService {
   private readonly http = inject(HttpClient);
   private readonly transactionPageUrl = `${environment.apiBaseUrl}/transaction/page`;
   private readonly cardTransactionPageUrl = `${environment.apiBaseUrl}/card/transaction/page`;
+  private readonly cardTransactionDownloadUrl = `${environment.apiBaseUrl}/card/transaction/download`;
   private readonly transactionDetailUrl = `${environment.apiBaseUrl}/transaction`;
   private readonly cardTransactionDetailUrl = `${environment.apiBaseUrl}/card/transaction`;
   private readonly paymentAssetsUrl = `${environment.apiBaseUrl}/payment/assets`;
@@ -79,14 +82,34 @@ export class PaymentsService {
       .set('page', String(query.page + 1))
       .set('size', String(query.size));
 
-    const search = query.searchParam?.trim();
-    if (search) {
-      params = params.set('searchParam', search);
+    for (const [key, value] of Object.entries({
+      searchParam: query.searchParam,
+      merchantId: query.merchantId,
+      startDate: query.startDate,
+      endDate: query.endDate
+    })) {
+      const normalizedValue = value?.trim();
+      if (normalizedValue) {
+        params = params.set(key, normalizedValue);
+      }
     }
 
     return this.http
       .get<TransactionPageResponse>(this.cardTransactionPageUrl, { params })
       .pipe(map(mapCardTransactionPageResponse));
+  }
+
+  downloadCardTransactions(query: CardTransactionDownloadQuery): Observable<CardTransactionDownloadResponse> {
+    let params = new HttpParams();
+
+    for (const [key, value] of Object.entries(query)) {
+      const normalizedValue = value?.trim();
+      if (normalizedValue) {
+        params = params.set(key, normalizedValue);
+      }
+    }
+
+    return this.http.get<CardTransactionDownloadResponse>(this.cardTransactionDownloadUrl, { params });
   }
 
   getTransactionDetail(transactionId: string): Observable<PaymentTransactionDetailView> {
@@ -250,6 +273,8 @@ function toCardTransaction(row: TransactionPageRecord): PaymentTransaction {
     statusClass: statusClassForLabel(status),
     amount: formatTransactionAmount(row.amount, currency),
     transactionType: row.cardType?.trim() || row.transactionType?.trim() || '--',
+    merchantId: row.merchantId?.trim() || '--',
+    transactionId: row.ref?.trim() || '--',
     date: formatDisplayDate(row.createdDate)
   };
 }

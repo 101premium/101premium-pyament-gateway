@@ -553,7 +553,7 @@ export class MerchantLayoutComponent {
       },
       {
         label: 'Settlement', icon: 'clipboard-document-list', link: '/settlement',
-        permission: ['ROLE_MERCHANT_ADMIN', 'ROLE_ADMIN', 'ROLE_ADMIN_USER', 'ROLE_SETTLEMENT']
+        permission: ['ROLE_SETTLEMENT', 'ROLE_ADMIN', 'ROLE_COMPLIANCE', 'ROLE_MERCHANT_ADMIN']
       },
       {
         label: 'Wallet', icon: 'wallet', link: '/wallet',

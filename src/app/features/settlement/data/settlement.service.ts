@@ -14,6 +14,9 @@ import { SummaryTableRow } from '../../../shared/components/payment-transactions
 import {
   SettlementDetailPageResponse,
   SettlementDetailRecord,
+  SettlementDownloadQuery,
+  SettlementDownloadResponse,
+  SettlementUploadResponse,
   SettlementPageRecord,
   SettlementPageResponse,
   SettlementPageResult,
@@ -25,6 +28,8 @@ export class SettlementService {
   private readonly http = inject(HttpClient);
   private readonly settlementPageUrl = `${environment.apiBaseUrl}/settlement/page`;
   private readonly settlementDetailPageUrl = `${environment.apiBaseUrl}/settlement/page/details`;
+  private readonly settlementDownloadUrl = `${environment.apiBaseUrl}/settlement/download`;
+  private readonly settlementUploadUrl = `${environment.apiBaseUrl}/settlement/upload`;
 
   getSettlements(query: SettlementQueryParams): Observable<SettlementPageResult> {
     let params = new HttpParams()
@@ -58,6 +63,25 @@ export class SettlementService {
     return this.http
       .get<SettlementDetailPageResponse>(this.settlementDetailPageUrl, { params })
       .pipe(map(mapSettlementDetailPageResponse));
+  }
+
+  downloadSettlements(query: SettlementDownloadQuery): Observable<SettlementDownloadResponse> {
+    let params = new HttpParams();
+
+    for (const [key, value] of Object.entries(query)) {
+      const normalizedValue = value?.trim();
+      if (normalizedValue) {
+        params = params.set(key, normalizedValue);
+      }
+    }
+
+    return this.http.get<SettlementDownloadResponse>(this.settlementDownloadUrl, { params });
+  }
+
+  uploadSettlement(file: File): Observable<SettlementUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post<SettlementUploadResponse>(this.settlementUploadUrl, formData);
   }
 }
 
