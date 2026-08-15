@@ -15,6 +15,7 @@ import { PaymentsService } from '../../../payment/data/payments.service';
 import { DashboardService } from '../../data/dashboard.service';
 import { DashboardChartBar, DashboardStatsData } from '../../data/dashboard.models';
 import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
+import { formatAmountNoCurrency, formatCount } from '../../../../shared/utils/format.utils';
 
 @Component({
   selector: 'app-dashboard-home-page',
@@ -25,8 +26,9 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
         <section class="merchant-stats">
           @if (statsLoading()) {
             <article class="merchant-stat-card" *ngFor="let _ of [1,2,3,4]">
-              <p class="stat-label skeleton-text"></p>
-              <strong class="skeleton-text"></strong>
+              <div class="skeleton-line skeleton-line--label"></div>
+              <div class="skeleton-line skeleton-line--value"></div>
+              <div class="skeleton-line skeleton-line--note"></div>
             </article>
           } @else {
             <article class="merchant-stat-card" *ngFor="let stat of stats()">
@@ -35,6 +37,28 @@ import { PageFooterComponent } from '../../../../shared/components/page-footer/p
               <span>{{ stat.note }}</span>
             </article>
           }
+        </section>
+
+        <section class="merchant-stats-group grid gap-2.5">
+          <div class="flex items-center justify-between">
+            <h3 class="m-0 text-sm font-bold uppercase tracking-wider text-[#5f6d85]">Card Transactions</h3>
+            <a routerLink="/payment/card-transactions" class="text-xs font-semibold text-[var(--primary)] no-underline hover:underline">View Card Transactions →</a>
+          </div>
+          <section class="merchant-stats">
+            @if (cardStatsLoading()) {
+              <article class="merchant-stat-card" *ngFor="let _ of [1,2,3,4]">
+                <div class="skeleton-line skeleton-line--label"></div>
+                <div class="skeleton-line skeleton-line--value"></div>
+                <div class="skeleton-line skeleton-line--note"></div>
+              </article>
+            } @else {
+              <article class="merchant-stat-card" *ngFor="let stat of cardStats()">
+                <p class="stat-label">{{ stat.label }}</p>
+                <strong>{{ stat.value }}</strong>
+                <span>{{ stat.note }}</span>
+              </article>
+            }
+          </section>
         </section>
 
         <section class="merchant-content">
@@ -166,6 +190,9 @@ export class DashboardHomePageComponent {
   protected readonly walletModalOpen = signal(false);
   protected readonly statsLoading = signal(false);
   protected readonly stats = signal<{ label: string; value: string; note: string }[]>([]);
+  protected readonly cardStatsLoading = signal(false);
+  protected readonly cardStats = signal<{ label: string; value: string; note: string }[]>([]);
+
   protected readonly tableHeaders: SummaryTableHeaders = {
     primary: 'Customer',
     status: 'Status',
@@ -205,6 +232,7 @@ export class DashboardHomePageComponent {
       .subscribe((searchParam) => this.loadTransactions(searchParam, 0));
 
     this.loadDashboardStats();
+    this.loadCardStats();
     this.loadGraph();
   }
 
@@ -246,12 +274,36 @@ export class DashboardHomePageComponent {
       });
   }
 
+  private loadCardStats(): void {
+    this.cardStatsLoading.set(true);
+
+    this.dashboardService
+      .getStats('card')
+      .pipe(
+        finalize(() => this.cardStatsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (data) => this.cardStats.set(this.mapCardStatsToCards(data)),
+        error: () => this.cardStats.set([])
+      });
+  }
+
   private mapStatsToCards(data: DashboardStatsData): { label: string; value: string; note: string }[] {
     return [
-      { label: 'Total Transactions', value: String(data.totalCount), note: `Volume: ${data.totalTransaction}` },
-      { label: 'Successful', value: String(data.successfulCount), note: `Volume: ${data.successfulTransaction}` },
-      { label: 'Pending', value: String(data.pendingCount), note: `Volume: ${data.pendingTransaction}` },
-      { label: 'Failed', value: String(data.failedCount), note: `Volume: ${data.failedTransaction}` }
+      { label: 'Total Transactions', value: formatCount(data.totalCount), note: `Volume: ${formatAmountNoCurrency(data.totalTransaction)}` },
+      { label: 'Successful', value: formatCount(data.successfulCount), note: `Volume: ${formatAmountNoCurrency(data.successfulTransaction)}` },
+      { label: 'Pending', value: formatCount(data.pendingCount), note: `Volume: ${formatAmountNoCurrency(data.pendingTransaction)}` },
+      { label: 'Failed', value: formatCount(data.failedCount), note: `Volume: ${formatAmountNoCurrency(data.failedTransaction)}` }
+    ];
+  }
+
+  private mapCardStatsToCards(data: DashboardStatsData): { label: string; value: string; note: string }[] {
+    return [
+      { label: 'Total Card Transactions', value: formatCount(data.totalCount), note: `Volume: ${formatAmountNoCurrency(data.totalTransaction)}` },
+      { label: 'Successful Card', value: formatCount(data.successfulCount), note: `Volume: ${formatAmountNoCurrency(data.successfulTransaction)}` },
+      { label: 'Pending Card', value: formatCount(data.pendingCount), note: `Volume: ${formatAmountNoCurrency(data.pendingTransaction)}` },
+      { label: 'Failed Card', value: formatCount(data.failedCount), note: `Volume: ${formatAmountNoCurrency(data.failedTransaction)}` }
     ];
   }
 

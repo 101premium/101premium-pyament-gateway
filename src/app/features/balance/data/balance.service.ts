@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { formatDisplayDate, initialsFromName } from '../../../shared/utils/format.utils';
+import { normalizeApiPageIndex } from '../../../shared/utils/pagination.utils';
 import {
   BalancePageRecord,
   BalancePageResponse,
@@ -45,7 +46,7 @@ function mapBalancePageResponse(res: BalancePageResponse): BalancePageResult {
 
   return {
     items: rows.map(toBalanceRow),
-    currentPage: page?.currentPage ?? 0,
+    currentPage: normalizeApiPageIndex(page?.currentPage),
     totalPages: page?.totalPages ?? 0,
     totalItems: page?.totalItems ?? 0
   };

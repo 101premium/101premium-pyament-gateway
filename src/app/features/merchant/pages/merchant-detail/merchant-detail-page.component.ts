@@ -361,6 +361,7 @@ export class MerchantDetailPageComponent {
       { label: 'CAC', value: m.cacNumber },
       { label: 'TIN', value: m.tinNumber },
       { label: 'Processor', value: m.processor },
+      { label: 'Card velocity', value: m.cardVelocity },
       ...(m.reason ? [{ label: 'Reason', value: m.reason }] : []),
       { label: 'Created', value: m.createdDate },
       { label: 'Updated', value: m.updatedDate }

@@ -4,7 +4,7 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { AuthService } from '../../../auth/data/auth.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { UserDetailView } from '../../data/users.models';
 import { UsersService } from '../../data/users.service';

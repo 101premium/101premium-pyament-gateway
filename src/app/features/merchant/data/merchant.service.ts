@@ -14,6 +14,7 @@ import {
   statusClassForLabel,
   titleCase
 } from '../../../shared/utils/format.utils';
+import { normalizeApiPageIndex } from '../../../shared/utils/pagination.utils';
 import { SummaryTableRow } from '../../../shared/components/payment-transactions-table/payment-transactions-table.component';
 import {
   CreateMerchantPayload,
@@ -111,7 +112,7 @@ function extractPageEnvelope(response: unknown, pageSize: number): {
     }
     return {
       items: p.data.map((row) => row as unknown as Record<string, unknown>),
-      currentPage: numberValue(p.currentPage) ?? 0,
+      currentPage: normalizeApiPageIndex(numberValue(p.currentPage)),
       totalPages,
       totalItems
     };
@@ -153,7 +154,7 @@ function extractPageEnvelope(response: unknown, pageSize: number): {
 
   return {
     items: rows,
-    currentPage,
+    currentPage: normalizeApiPageIndex(currentPage),
     totalPages,
     totalItems
   };
@@ -521,6 +522,10 @@ function mapMerchantDetailView(row: Record<string, unknown>): MerchantDetailView
     cacNumber: stringValue(row['cacNumber']) || '—',
     tinNumber: stringValue(row['tinNumber']) || '—',
     processor: stringValue(row['processor']) || '—',
+    cardVelocity:
+      typeof row['cardVelocity'] === 'number'
+        ? String(row['cardVelocity'])
+        : stringValue(row['cardVelocity']) || '2',
     statusText,
     statusTone,
     approved: approvedCode,

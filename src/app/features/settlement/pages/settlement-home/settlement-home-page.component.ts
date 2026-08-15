@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -12,7 +12,8 @@ import {
 import { TablePaginationComponent } from '../../../../shared/components/table-pagination/table-pagination.component';
 import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { triggerFileDownload } from '../../../../shared/utils/download.utils';
+import { AuthService } from '../../../auth/data/auth.service';
 import { SettlementService } from '../../data/settlement.service';
 
 @Component({
@@ -161,6 +162,7 @@ import { SettlementService } from '../../data/settlement.service';
   `
 })
 export class SettlementHomePageComponent {
+  private readonly http = inject(HttpClient);
   private readonly settlementService = inject(SettlementService);
   private readonly toastService = inject(ToastService);
   private readonly authService = inject(AuthService);
@@ -248,19 +250,13 @@ export class SettlementHomePageComponent {
       .pipe(finalize(() => this.isDownloading.set(false)))
       .subscribe({
         next: (response) => {
-          const fileUrl = this.safeDownloadUrl(response.data);
-          if (!fileUrl) {
-            this.toastService.show('The server did not return a valid download link.');
-            return;
-          }
-
-          const link = document.createElement('a');
-          link.href = fileUrl.href;
-          link.download = this.downloadFilename(fileUrl);
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          link.click();
-          this.toastService.show('Settlements downloaded.', 'success');
+          triggerFileDownload(
+            this.http,
+            response.data,
+            this.toastService,
+            'settlements.xlsx',
+            'Settlements downloaded.'
+          );
         },
         error: (error: unknown) => this.toastService.show(this.resolveDownloadErrorMessage(error))
       });

@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { formatDisplayDate } from '../../../shared/utils/format.utils';
+import { normalizeApiPageIndex } from '../../../shared/utils/pagination.utils';
 import {
   WalletTransaction,
   WalletTransactionRecord,
@@ -32,7 +33,7 @@ function mapWalletPageResponse(res: WalletTransactionPageResponse): WalletTransa
 
   return {
     items: rows.map(toWalletTransaction),
-    currentPage: page?.currentPage ?? 0,
+    currentPage: normalizeApiPageIndex(page?.currentPage),
     totalPages: page?.totalPages ?? 0,
     totalItems: page?.totalItems ?? 0
   };

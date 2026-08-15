@@ -15,6 +15,7 @@ import {
   statusClassForLabel,
   titleCase
 } from '../../../shared/utils/format.utils';
+import { normalizeApiPageIndex } from '../../../shared/utils/pagination.utils';
 import { SummaryTableRow } from '../../../shared/components/payment-transactions-table/payment-transactions-table.component';
 import {
   CreateRolePayload,
@@ -117,7 +118,7 @@ function extractPageEnvelope(response: unknown): {
 
   return {
     items: rows,
-    currentPage: numberValue(data?.['currentPage']) ?? numberValue(payload?.['currentPage']) ?? 0,
+    currentPage: normalizeApiPageIndex(numberValue(data?.['currentPage']) ?? numberValue(payload?.['currentPage'])),
     totalPages: numberValue(data?.['totalPages']) ?? numberValue(payload?.['totalPages']) ?? 0,
     totalItems:
       numberValue(data?.['totalItems']) ?? numberValue(payload?.['totalItems']) ?? rows.length

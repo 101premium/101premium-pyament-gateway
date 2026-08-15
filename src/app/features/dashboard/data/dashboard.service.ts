@@ -16,9 +16,13 @@ export class DashboardService {
   private readonly dashboardUrl = `${environment.apiBaseUrl}/dashboard`;
   private readonly graphUrl = `${environment.apiBaseUrl}/dashboard/graph`;
 
-  getStats(): Observable<DashboardStatsData> {
+  getStats(transactionType?: string): Observable<DashboardStatsData> {
+    let params = new HttpParams();
+    if (transactionType) {
+      params = params.set('transactionType', transactionType);
+    }
     return this.http
-      .get<DashboardStatsResponse>(this.dashboardUrl)
+      .get<DashboardStatsResponse>(this.dashboardUrl, { params })
       .pipe(map((res) => res.data));
   }
 

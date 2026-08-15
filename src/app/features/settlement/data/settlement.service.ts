@@ -10,6 +10,7 @@ import {
   statusClassForLabel,
   titleCase
 } from '../../../shared/utils/format.utils';
+import { normalizeApiPageIndex } from '../../../shared/utils/pagination.utils';
 import { SummaryTableRow } from '../../../shared/components/payment-transactions-table/payment-transactions-table.component';
 import {
   SettlementDetailPageResponse,
@@ -91,7 +92,7 @@ function mapSettlementPageResponse(response: SettlementPageResponse): Settlement
 
   return {
     items: rows.map(toSettlementRow),
-    currentPage: normalizePageIndex(page?.currentPage ?? 0, page?.totalPages ?? 0),
+    currentPage: normalizeApiPageIndex(page?.currentPage),
     totalPages: page?.totalPages ?? 0,
     totalItems: page?.totalItems ?? 0
   };
@@ -137,7 +138,7 @@ function mapSettlementDetailPageResponse(response: SettlementDetailPageResponse)
 
   return {
     items: rows.map(toSettlementDetailRow),
-    currentPage: normalizePageIndex(page?.currentPage ?? 0, page?.totalPages ?? 0),
+    currentPage: normalizeApiPageIndex(page?.currentPage),
     totalPages: page?.totalPages ?? 0,
     totalItems: page?.totalItems ?? 0
   };

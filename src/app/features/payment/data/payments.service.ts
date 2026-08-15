@@ -10,6 +10,7 @@ import {
   statusClassForLabel,
   titleCase
 } from '../../../shared/utils/format.utils';
+import { normalizeApiPageIndex } from '../../../shared/utils/pagination.utils';
 import {
   PaymentQueryParams,
   CardTransactionDownloadQuery,
@@ -203,7 +204,7 @@ function mapTransactionPageResponse(res: TransactionPageResponse, routePrefix: s
 
   return {
     items: rows.map((row) => toPaymentTransaction(row, routePrefix)),
-    currentPage: page?.currentPage ?? 0,
+    currentPage: normalizeApiPageIndex(page?.currentPage),
     totalPages: page?.totalPages ?? 0,
     totalItems: page?.totalItems ?? 0
   };
@@ -215,7 +216,7 @@ function mapCardTransactionPageResponse(res: TransactionPageResponse): PaymentTr
 
   return {
     items: rows.map(toCardTransaction),
-    currentPage: page?.currentPage ?? 0,
+    currentPage: normalizeApiPageIndex(page?.currentPage),
     totalPages: page?.totalPages ?? 0,
     totalItems: page?.totalItems ?? 0
   };

@@ -79,20 +79,31 @@ import { AuthService } from '../../data/auth.service';
                     </svg>
                   </span>
                   <input
-                    type="password"
+                    [type]="showPassword() ? 'text' : 'password'"
                     placeholder="••••••••"
                     formControlName="password"
                     class="h-[51px] w-full rounded-[24px] border border-transparent bg-[#f1f4f7] pl-11 pr-12 text-base leading-[19px] text-[#2d3337] outline-none transition focus:border-[rgba(96,123,254,0.28)] focus:shadow-[0_0_0_4px_rgba(96,123,254,0.12)] placeholder:text-[rgba(118,123,127,0.6)]"
                   />
-                  <span
-                    class="pointer-events-none absolute right-4 top-1/2 inline-flex -translate-y-1/2 text-[#767b7f]"
-                    aria-hidden="true"
+                  <button
+                    type="button"
+                    (click)="showPassword.set(!showPassword())"
+                    [attr.aria-pressed]="showPassword()"
+                    [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                    class="absolute right-3 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-[#767b7f] transition hover:bg-black/5 hover:text-[#2d3337]"
                   >
-                    <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  </span>
+                    @if (showPassword()) {
+                      <!-- Heroicons: eye-slash 24 outline -->
+                      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                      </svg>
+                    } @else {
+                      <!-- Heroicons: eye 24 outline -->
+                      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      </svg>
+                    }
+                  </button>
                 </div>
                 <span class="text-xs font-medium text-[#d14343]" *ngIf="passwordInvalid()">
                   Password must be at least 6 characters.
@@ -138,6 +149,7 @@ export class LoginPageComponent {
   private readonly router = inject(Router);
 
   protected readonly isSubmitting = signal(false);
+  protected readonly showPassword = signal(false);
   protected readonly errorMessage = signal('');
   protected readonly successMessage = signal('');
   protected readonly loginForm = this.formBuilder.nonNullable.group({

@@ -30,3 +30,14 @@ export function buildPageLinkIndices(
   start = Math.min(start, totalPages - count);
   return Array.from({ length: count }, (_, i) => start + i);
 }
+
+/**
+ * Normalizes 1-based page numbers returned by backend APIs to 0-based page indices for UI components.
+ * E.g., API page 1 -> 0, API page 2 -> 1.
+ */
+export function normalizeApiPageIndex(apiPage: number | null | undefined): number {
+  if (typeof apiPage !== 'number' || !Number.isFinite(apiPage) || apiPage <= 1) {
+    return 0;
+  }
+  return apiPage - 1;
+}

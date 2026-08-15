@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject, PLATFORM_ID, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
@@ -11,7 +11,8 @@ import { TablePaginationComponent } from '../../../../shared/components/table-pa
 import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
 import { MerchantSearchService } from '../../../../shared/services/merchant-search.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { triggerFileDownload } from '../../../../shared/utils/download.utils';
+import { AuthService } from '../../../auth/data/auth.service';
 import { PaymentTransaction } from '../../data/payments.models';
 import { PaymentsService } from '../../data/payments.service';
 
@@ -144,6 +145,7 @@ import { PaymentsService } from '../../data/payments.service';
   `
 })
 export class CardTransactionPageComponent {
+  private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
   private readonly paymentsService = inject(PaymentsService);
   private readonly merchantSearch = inject(MerchantSearchService);
@@ -241,19 +243,13 @@ export class CardTransactionPageComponent {
       .pipe(finalize(() => this.isDownloading.set(false)))
       .subscribe({
         next: (response) => {
-          const fileUrl = this.safeDownloadUrl(response.data);
-          if (!fileUrl) {
-            this.toastService.show('The server did not return a valid download link.');
-            return;
-          }
-
-          const link = document.createElement('a');
-          link.href = fileUrl.href;
-          link.download = this.downloadFilename(fileUrl);
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          link.click();
-          this.toastService.show('Card transactions downloaded.', 'success');
+          triggerFileDownload(
+            this.http,
+            response.data,
+            this.toastService,
+            `card-transactions-${new Date().toISOString().slice(0, 10)}.xlsx`,
+            'Card transactions downloaded.'
+          );
         },
         error: (error: unknown) => this.toastService.show(this.resolveDownloadErrorMessage(error))
       });

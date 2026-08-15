@@ -29,6 +29,35 @@ export function formatCurrencyAmount(value: number, currencyCode: string): strin
   }
 }
 
+/** Formats a number or numeric string with thousand separators without any currency symbol. */
+export function formatAmountNoCurrency(value: number | string | null | undefined, decimals = 2): string {
+  if (value === null || value === undefined || value === '') {
+    return (0).toFixed(decimals);
+  }
+  const num = typeof value === 'number' ? value : Number(String(value).replace(/[^0-9.-]/g, ''));
+  if (Number.isNaN(num)) {
+    return String(value);
+  }
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(num);
+}
+
+/** Formats an integer count with thousand separators. */
+export function formatCount(value: number | string | null | undefined): string {
+  if (value === null || value === undefined || value === '') {
+    return '0';
+  }
+  const num = typeof value === 'number' ? value : Number(String(value).replace(/[^0-9.-]/g, ''));
+  if (Number.isNaN(num)) {
+    return String(value);
+  }
+  return new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 0
+  }).format(num);
+}
+
 /**
  * Formats an ISO-like datetime for display. Empty input → "Date unavailable";
  * unparseable input → returns the trimmed original string.

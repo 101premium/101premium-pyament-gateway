@@ -15,7 +15,7 @@ import { RolesService } from '../../data/roles.service';
 import { UsersService } from '../../data/users.service';
 import { RoleStatData, UserStatData } from '../../data/users.models';
 import { PageFooterComponent } from '../../../../shared/components/page-footer/page-footer.component';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { AuthService } from '../../../auth/data/auth.service';
 
 type UserTab = 'users' | 'roles';
 

@@ -64,6 +64,7 @@ export interface MerchantDetailView {
   cacNumber: string;
   tinNumber: string;
   processor: string;
+  cardVelocity: string;
   statusText: string;
   statusTone: string;
   /** Raw API flag: `"0"` pending, `"1"` approved, etc. */
@@ -120,6 +121,7 @@ export interface MerchantBusinessRecord {
   cacNumber: string;
   tinNumber: string;
   processor: string | null;
+  cardVelocity?: number | string | null;
   merchantId: string;
   /** Account state code from API (e.g. `"1"` active, `"2"` inactive). */
   status: string;
