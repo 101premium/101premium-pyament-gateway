@@ -197,7 +197,6 @@ export class SettlementHomePageComponent {
     primary: 'Transaction Date',
     status: 'Count',
     amount: 'Amount',
-    transactionType: 'Fee',
     meta: 'Settlement'
   };
 

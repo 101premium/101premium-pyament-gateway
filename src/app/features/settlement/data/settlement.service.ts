@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
+  formatAmountNoCurrency,
   formatCurrencyAmount,
   formatDisplayDate,
   formatMoney,
@@ -99,7 +100,6 @@ function mapSettlementPageResponse(response: SettlementPageResponse): Settlement
 }
 
 function toSettlementRow(row: SettlementPageRecord): SummaryTableRow {
-  const currency = row.currency?.trim() || 'NGN';
   const merchantName = row.merchantName?.trim() || 'Unknown merchant';
   const merchantId = row.merchantId?.trim();
 
@@ -111,9 +111,8 @@ function toSettlementRow(row: SettlementPageRecord): SummaryTableRow {
     secondaryText: merchantId ? `${merchantName} · ${merchantId}` : merchantName,
     statusText: `${row.transactionCount ?? 0}`,
     statusTone: 'pending',
-    amountText: formatSettlementAmount(row.amount, currency),
-    transactionTypeText: formatSettlementAmount(row.fee, currency),
-    metaText: formatSettlementAmount(row.settlementAmount, currency)
+    amountText: formatAmountNoCurrency(row.amount),
+    metaText: formatAmountNoCurrency(row.settlementAmount)
   };
 }
 

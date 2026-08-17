@@ -324,7 +324,7 @@ export class DashboardHomePageComponent {
     this.errorMessage.set('');
 
     this.paymentsService
-      .getTransactions({
+      .getCardTransactions({
         searchParam,
         page,
         size: this.pageSize
