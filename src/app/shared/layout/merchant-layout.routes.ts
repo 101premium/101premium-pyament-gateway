@@ -13,6 +13,7 @@ import { PayoutDetailPageComponent } from '../../features/payout/pages/payout-de
 import { WalletHomePageComponent } from '../../features/wallet/pages/wallet-home/wallet-home-page.component';
 import { AddCustomerPageComponent } from '../../features/tools/pages/add-customer/add-customer-page.component';
 import { CreateInvoicePageComponent } from '../../features/tools/pages/create-invoice/create-invoice-page.component';
+import { PaymentLinkDetailPageComponent } from '../../features/payment-link/pages/payment-link-detail/payment-link-detail-page.component';
 import { NewPaymentLinkPageComponent } from '../../features/tools/pages/new-payment-link/new-payment-link-page.component';
 import { AddRolePageComponent } from '../../features/users/pages/add-role/add-role-page.component';
 import { AddUserPageComponent } from '../../features/users/pages/add-user/add-user-page.component';
@@ -41,6 +42,7 @@ export const merchantLayoutRoutes: Routes = [
   { path: 'settlement', component: SettlementHomePageComponent, canActivate: [settlementPageGuard] },
   { path: 'transactions', component: PaymentHomePageComponent },
   { path: 'payment-link', component: PaymentLinkHomePageComponent },
+  { path: 'payment-link/:reference', component: PaymentLinkDetailPageComponent },
   { path: 'payout', component: PayoutHomePageComponent },
   { path: 'payout/:transactionId', component: PayoutDetailPageComponent },
   { path: 'payment', component: PaymentHomePageComponent },
